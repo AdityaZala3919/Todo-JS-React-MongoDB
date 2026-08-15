@@ -14,7 +14,7 @@ export const TimeRepository = {
   update(id, fields) {
     const session = MemoryDb.time_sessions.find((ts) => ts.id === id);
     if (!session) return;
-    const allowed = ['end_time', 'duration', 'notes', 'occurrence_id'];
+    const allowed = ['end_time', 'duration', 'notes', 'occurrence_id', 'is_paused'];
     const updatedFields = {};
     for (const [key, value] of Object.entries(fields)) { if (allowed.includes(key)) { session[key] = value; updatedFields[key] = value; } }
     MemoryDb.sync('time_sessions', 'update', { id, ...updatedFields });

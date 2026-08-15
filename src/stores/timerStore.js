@@ -10,6 +10,7 @@ export const useTimerStore = create((set, get) => ({
   _unsub: null,
 
   syncState: () => {
+    TimerService.restoreActiveTimer();
     set({
       isRunning: TimerService.isRunning(),
       isPaused: TimerService.isPaused(),
