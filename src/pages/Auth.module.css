@@ -1,0 +1,16 @@
+.page { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; position: relative; overflow: hidden; }
+.orbs { position: absolute; inset: 0; pointer-events: none; }
+.orb1 { position: absolute; width: 400px; height: 400px; border-radius: 50%; background: radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%); top: -100px; left: -100px; animation: float 8s ease-in-out infinite; }
+.orb2 { position: absolute; width: 350px; height: 350px; border-radius: 50%; background: radial-gradient(circle, rgba(20,184,166,0.1) 0%, transparent 70%); bottom: -80px; right: -80px; animation: float 10s ease-in-out infinite reverse; }
+@keyframes float { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(20px, -20px); } }
+.card { width: 100%; max-width: 400px; padding: 40px 36px; background: rgba(15,16,22,0.85); border: 1px solid var(--glass-border); border-radius: var(--radius-xl); backdrop-filter: blur(24px); position: relative; z-index: 1; }
+.logoRow { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; }
+.logoIcon { width: 36px; height: 36px; border-radius: var(--radius-md); background: var(--accent-dim); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: var(--text-md); color: #fff; }
+.logoText { font-size: var(--text-xl); font-weight: 700; letter-spacing: -0.03em; }
+.heading { font-size: var(--text-2xl); font-weight: 700; margin-bottom: 6px; }
+.sub { font-size: var(--text-sm); color: var(--text-muted); margin-bottom: 20px; }
+.error { font-size: var(--text-sm); color: #f87171; background: rgba(248,113,113,0.08); padding: 10px 14px; border-radius: var(--radius-md); margin-bottom: 14px; border: 1px solid rgba(248,113,113,0.2); }
+.form { display: flex; flex-direction: column; gap: 12px; }
+.switch { font-size: var(--text-sm); color: var(--text-muted); margin-top: 20px; text-align: center; }
+.switchBtn { color: var(--accent-bright); font-weight: 600; background: none; border: none; cursor: pointer; font-size: inherit; }
+.switchBtn:hover { text-decoration: underline; }

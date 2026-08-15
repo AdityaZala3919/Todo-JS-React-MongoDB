@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f1424"/>
+      <stop offset="100%" stop-color="#07090e"/>
+    </linearGradient>
+
+    <!-- Icon Gradient -->
+    <linearGradient id="iconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="50%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#818cf8"/>
+    </linearGradient>
+
+    <!-- Glow Effect -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background Squircle -->
+  <rect x="32" y="32" width="448" height="448" rx="112" fill="url(#bgGrad)" stroke="#1e293b" stroke-width="6"/>
+
+  <!-- Checkmark + Flow Icon Group -->
+  <g transform="translate(0, 10)">
+    <!-- Subtle Back Glow Check -->
+    <path fill="none" 
+          stroke="url(#iconGrad)" 
+          stroke-width="48" 
+          stroke-linecap="round" 
+          stroke-linejoin="round" 
+          opacity="0.35"
+          filter="url(#glow)"
+          d="M 136 256 L 224 344 L 376 160" />
+
+    <!-- Sharp Main Checkmark with Flow Accent -->
+    <path fill="none" 
+          stroke="url(#iconGrad)" 
+          stroke-width="44" 
+          stroke-linecap="round" 
+          stroke-linejoin="round" 
+          d="M 136 256 L 224 344 L 376 160" />
+
+    <!-- Flow Dynamic Dot Accent -->
+    <circle cx="376" cy="160" r="16" fill="#38bdf8"/>
+  </g>
+</svg>

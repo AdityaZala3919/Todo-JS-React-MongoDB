@@ -1,0 +1,9 @@
+.topBar { height: var(--top-bar-height); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; border-bottom: 1px solid var(--glass-border); background: rgba(10,11,16,0.6); backdrop-filter: blur(16px); gap: 16px; }
+.searchBox { display: flex; align-items: center; gap: 8px; background: var(--surface-1); border: 1px solid var(--glass-border); border-radius: var(--radius-full); padding: 7px 14px; flex: 1; max-width: 360px; transition: var(--transition); }
+.searchBox:focus-within { border-color: var(--accent); background: var(--surface-2); }
+.searchIcon { color: var(--text-muted); flex-shrink: 0; }
+.searchInput { border: none; outline: none; background: transparent; flex: 1; font-size: var(--text-sm); color: var(--text-primary); min-width: 0; }
+.searchInput::placeholder { color: var(--text-disabled); }
+.kbd { font-size: 10px; padding: 2px 6px; border-radius: 4px; background: var(--surface-2); color: var(--text-muted); font-family: var(--font-mono); border: 1px solid var(--glass-border); }
+.btnText { }
+@media (max-width: 768px) { .topBar { padding: 0 16px; } .btnText { display: none; } .searchBox { max-width: unset; } }

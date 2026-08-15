@@ -1,0 +1,104 @@
+.page {
+  padding: 24px;
+  max-width: 700px;
+  margin: 0 auto;
+  animation: fadeIn 0.3s var(--ease);
+}
+
+.title {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.card {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--glass-border);
+  padding-bottom: 10px;
+}
+
+.cardHeader h2 {
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.icon {
+  color: var(--accent);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.inputGroup label {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.actionBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-bottom: 1px solid var(--glass-border);
+  padding-bottom: 16px;
+}
+
+.actionBlock:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.blockDescription {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.themeRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--text-sm);
+}
+
+.themeBadge {
+  font-size: var(--text-xs);
+  background: var(--accent-subtle);
+  color: var(--accent-bright);
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 16px;
+    padding-bottom: 80px;
+  }
+}

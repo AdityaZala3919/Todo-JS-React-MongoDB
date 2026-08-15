@@ -1,0 +1,29 @@
+node_modules
+.vercel
+.env
+dist
+dist-ssr
+*.local
+.DS_Store
+
+# Temporary / backup directories
+git_old/
+*.bak
+*.tmp
+
+# Editor & IDE files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Logs & output
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+coverage/

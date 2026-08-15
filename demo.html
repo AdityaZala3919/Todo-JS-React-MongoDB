@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TaskFlow | Todo & Time Management Demo</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    /* CSS Variables & Design Tokens */
+    :root {
+      --bg-dark: #07080c;
+      --bg-gradient: radial-gradient(circle at 15% 15%, rgba(20, 184, 166, 0.12) 0%, transparent 40%),
+                         radial-gradient(circle at 85% 75%, rgba(56, 189, 248, 0.08) 0%, transparent 45%),
+                         #07080c;
+      
+      --glass-bg: rgba(255, 255, 255, 0.03);
+      --glass-bg-hover: rgba(255, 255, 255, 0.06);
+      --glass-bg-active: rgba(255, 255, 255, 0.09);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --glass-border-teal: rgba(20, 184, 166, 0.3);
+      
+      --accent-teal: #14b8a6;
+      --accent-teal-bright: #2dd4bf;
+      --accent-teal-glow: 0 0 20px rgba(20, 184, 166, 0.35);
+      --accent-cyan: #06b6d4;
+      
+      --text-primary: #f3f4f6;
+      --text-secondary: #9ca3af;
+      --text-muted: #6b7280;
+      
+      /* Priority colors */
+      --priority-low: #3b82f6;
+      --priority-medium: #14b8a6;
+      --priority-high: #f59e0b;
+      --priority-urgent: #ef4444;
+
+      --font-main: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-full: 9999px;
+      
+      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-main);
+      background: var(--bg-gradient);
+      background-attachment: fixed;
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Ambient background glow ORBs */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(100px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .orb-1 {
+      top: -100px;
+      left: -100px;
+      width: 400px;
+      height: 400px;
+      background: rgba(20, 184, 166, 0.15);
+    }
+    .orb-2 {
+      bottom: -150px;
+      right: -100px;
+      width: 500px;
+      height: 500px;
+      background: rgba(14, 165, 233, 0.12);
+    }
+
+    /* Glassmorphism Card Utility */
+    .glass-panel {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      transition: var(--transition);
+    }
+
+    .glass-panel:hover {
+      border-color: rgba(255, 255, 255, 0.14);
+    }
+
+    /* Layout */
+    .app-container {
+      display: flex;
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Sidebar (Desktop) */
+    .sidebar {
+      width: 260px;
+      height: 100vh;
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-right: 1px solid var(--glass-border);
+      background: rgba(7, 8, 12, 0.6);
+      backdrop-filter: blur(24px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 12px 24px 12px;
+    }
+
+    .brand-logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent-teal), var(--accent-cyan));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #000;
+      font-weight: 700;
+      box-shadow: var(--accent-teal-glow);
+    }
+
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(to right, #fff, #9ca3af);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-section {
+      margin-bottom: 24px;
+    }
+
+    .nav-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      padding: 0 12px 8px 12px;
+      font-weight: 600;
+    }
+
+    .nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .nav-item a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .nav-item a:hover {
+      color: var(--text-primary);
+      background: var(--glass-bg-hover);
+    }
+
+    .nav-item.active a {
+      color: var(--accent-teal-bright);
+      background: rgba(20, 184, 166, 0.1);
+      border: 1px solid rgba(20, 184, 166, 0.2);
+      font-weight: 600;
+    }
+
+    .nav-item.active a i {
+      color: var(--accent-teal-bright);
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-top: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+    }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+
+    .user-info {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .user-name {
+      font-size: 0.88rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-role {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Main Content Area */
+    .main-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    /* Top Bar Header */
+    .top-bar {
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--glass-border);
+      background: rgba(7, 8, 12, 0.4);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .search-box {
+      position: relative;
+      width: 320px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 10px 14px 10px 40px;
+      border-radius: var(--radius-full);
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      color: var(--text-primary);
+      font-family: var(--font-main);
+      font-size: 0.88rem;
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .search-box input:focus {
+      border-color: var(--accent-teal);
+      background: rgba(255, 255, 255, 0.05);
+      box-shadow: 0 0 15px rgba(20, 184, 166, 0.15);
+    }
+
+    .search-box i {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      width: 18px;
+      height: 18px;
+    }
+
+    .kbd-shortcut {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      background: rgba(255, 255, 255, 0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--text-muted);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .btn-primary {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: var(--radius-full);
+      background: linear-gradient(135deg, var(--accent-teal), #0d9488);
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.88rem;
+      border: none;
+      cursor: pointer;
+      box-shadow: var(--accent-teal-glow);
+      transition: var(--transition);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.1);
+    }
+
+    .icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .icon-btn:hover {
+      color: var(--text-primary);
+      background: var(--glass-bg-hover);
+    }
+
+    /* Content Layout Grid */
+    .content-body {
+      padding: 32px;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 28px;
+    }
+
+    /* Left Column: Stats + Task Lists */
+    .dashboard-main {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .stat-card {
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(to right, var(--accent-teal), transparent);
+    }
+
+    .stat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--text-secondary);
+      font-size: 0.82rem;
+      font-weight: 500;
+      margin-bottom: 12px;
+    }
+
+    .stat-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(20, 184, 166, 0.1);
+      color: var(--accent-teal-bright);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .stat-value {
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 4px;
+      font-family: var(--font-mono);
+    }
+
+    .stat-sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .stat-sub.positive {
+      color: var(--accent-teal-bright);
+    }
+
+    /* Task Section */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .badge-count {
+      font-size: 0.75rem;
+      background: rgba(20, 184, 166, 0.15);
+      color: var(--accent-teal-bright);
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      font-weight: 600;
+    }
+
+    .filter-pills {
+      display: flex;
+      gap: 8px;
+    }
+
+    .pill {
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .pill.active, .pill:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-primary);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .pill.active {
+      border-color: var(--accent-teal);
+      color: var(--accent-teal-bright);
+    }
+
+    /* Compact Glassmorphic Task List */
+    .task-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .task-card {
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      position: relative;
+    }
+
+    .task-card:hover {
+      background: var(--glass-bg-hover);
+      border-color: rgba(20, 184, 166, 0.25);
+      transform: translateX(2px);
+    }
+
+    /* Priority Left Indicator Bar */
+    .priority-indicator {
+      width: 4px;
+      height: 24px;
+      border-radius: 4px;
+    }
+    .priority-indicator.urgent { background: var(--priority-urgent); box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
+    .priority-indicator.high { background: var(--priority-high); }
+    .priority-indicator.medium { background: var(--priority-medium); }
+    .priority-indicator.low { background: var(--priority-low); }
+
+    /* Custom Checkbox */
+    .custom-checkbox {
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 2px solid var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+      flex-shrink: 0;
+    }
+
+    .custom-checkbox:hover {
+      border-color: var(--accent-teal);
+    }
+
+    .task-card.completed .custom-checkbox {
+      background: var(--accent-teal);
+      border-color: var(--accent-teal);
+    }
+
+    .task-card.completed .task-title {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+
+    .task-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .task-title-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .task-title {
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .tag-badge {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-secondary);
+    }
+
+    .task-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .streak-badge {
+      color: #f97316;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    /* Recurring Progress Bar in Row */
+    .task-progress-box {
+      width: 140px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .task-progress-text {
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      color: var(--text-secondary);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .progress-bar-bg {
+      height: 6px;
+      border-radius: var(--radius-full);
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: var(--radius-full);
+      background: linear-gradient(to right, var(--accent-teal), var(--accent-cyan));
+      box-shadow: 0 0 8px rgba(20, 184, 166, 0.4);
+    }
+
+    .task-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      opacity: 0;
+      transition: var(--transition);
+    }
+
+    .task-card:hover .task-actions {
+      opacity: 1;
+    }
+
+    .task-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      border: none;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .task-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+
+    .task-btn.timer-btn:hover {
+      background: rgba(20, 184, 166, 0.2);
+      color: var(--accent-teal-bright);
+    }
+
+    /* Right Sidebar Widgets */
+    .dashboard-side {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Live Timer Widget */
+    .timer-widget {
+      padding: 24px;
+      text-align: center;
+      background: linear-gradient(145deg, rgba(20, 184, 166, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+      border-color: rgba(20, 184, 166, 0.2);
+    }
+
+    .timer-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent-teal-bright);
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .timer-task-name {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+    }
+
+    .timer-digits {
+      font-family: var(--font-mono);
+      font-size: 2.75rem;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      color: #fff;
+      text-shadow: 0 0 20px rgba(20, 184, 166, 0.4);
+      margin-bottom: 20px;
+    }
+
+    .timer-controls {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .btn-timer-action {
+      padding: 10px 24px;
+      border-radius: var(--radius-full);
+      border: none;
+      font-family: var(--font-main);
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: var(--transition);
+    }
+
+    .btn-timer-start {
+      background: linear-gradient(135deg, var(--accent-teal), #0d9488);
+      color: #fff;
+      box-shadow: var(--accent-teal-glow);
+    }
+
+    .btn-timer-stop {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    /* Mini Calendar Heatmap Widget */
+    .mini-calendar {
+      padding: 20px;
+    }
+
+    .cal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      text-align: center;
+    }
+
+    .cal-day-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .cal-cell {
+      aspect-ratio: 1;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.03);
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+
+    .cal-cell:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .cal-cell.active-today {
+      border: 1px solid var(--accent-teal);
+      color: var(--accent-teal-bright);
+      font-weight: 700;
+    }
+
+    .cal-cell.done-full {
+      background: rgba(20, 184, 166, 0.3);
+      color: #fff;
+    }
+
+    .cal-cell.done-partial {
+      background: rgba(20, 184, 166, 0.15);
+    }
+
+    /* Overdue Section Highlight */
+    .overdue-box {
+      padding: 16px 20px;
+      border-color: rgba(239, 68, 68, 0.25);
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.06), transparent);
+    }
+
+    .overdue-title {
+      color: #f87171;
+      font-size: 0.88rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    /* Mobile Bottom Tab Bar */
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 64px;
+      background: rgba(7, 8, 12, 0.85);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid var(--glass-border);
+      z-index: 100;
+      justify-content: space-around;
+      align-items: center;
+    }
+
+    .mobile-tab {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.68rem;
+      font-weight: 500;
+    }
+
+    .mobile-tab.active {
+      color: var(--accent-teal-bright);
+    }
+
+    /* Responsive Breakpoints */
+    @media (max-width: 1024px) {
+      .content-body {
+        grid-template-columns: 1fr;
+      }
+      .dashboard-side {
+        order: -1;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+      .mobile-nav {
+        display: flex;
+      }
+      .top-bar {
+        padding: 16px 20px;
+      }
+      .search-box {
+        width: 200px;
+      }
+      .content-body {
+        padding: 20px;
+        padding-bottom: 80px;
+      }
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+      .task-progress-box {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Ambient background glow Orbs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <div class="app-container">
+    <!-- Desktop Left Sidebar -->
+    <aside class="sidebar">
+      <div>
+        <div class="brand">
+          <div class="brand-logo">T</div>
+          <span class="brand-title">TaskFlow</span>
+        </div>
+
+        <nav class="nav-section">
+          <div class="nav-label">Menu</div>
+          <ul class="nav-list">
+            <li class="nav-item active">
+              <a href="#"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+            </li>
+            <li class="nav-item">
+              <a href="#"><i data-lucide="check-square"></i> Tasks</a>
+            </li>
+            <li class="nav-item">
+              <a href="#"><i data-lucide="timer"></i> Time Tracking</a>
+            </li>
+            <li class="nav-item">
+              <a href="#"><i data-lucide="calendar"></i> Calendar</a>
+            </li>
+            <li class="nav-item">
+              <a href="#"><i data-lucide="bar-chart-2"></i> Statistics</a>
+            </li>
+          </ul>
+        </nav>
+
+        <nav class="nav-section">
+          <div class="nav-label">Projects</div>
+          <ul class="nav-list">
+            <li class="nav-item">
+              <a href="#"><i data-lucide="folder" style="color:#14b8a6"></i> DSA Prep</a>
+            </li>
+            <li class="nav-item">
+              <a href="#"><i data-lucide="folder" style="color:#3b82f6"></i> College RAG</a>
+            </li>
+            <li class="nav-item">
+              <a href="#"><i data-lucide="folder" style="color:#a855f7"></i> Personal</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+
+      <!-- User Profile -->
+      <div class="user-profile glass-panel">
+        <div class="avatar">JS</div>
+        <div class="user-info">
+          <div class="user-name">John Doe</div>
+          <div class="user-role">Local Storage Mode</div>
+        </div>
+        <i data-lucide="log-out" style="width: 18px; height: 18px; color: var(--text-muted)"></i>
+      </div>
+    </aside>
+
+    <!-- Main Workspace -->
+    <div class="main-wrapper">
+      <!-- Top Navigation Bar -->
+      <header class="top-bar">
+        <div class="search-box">
+          <i data-lucide="search"></i>
+          <input type="text" placeholder="Search tasks, projects, tags...">
+          <span class="kbd-shortcut">/</span>
+        </div>
+
+        <div class="header-actions">
+          <button class="icon-btn" title="Toggle Theme">
+            <i data-lucide="moon" style="width: 18px; height: 18px"></i>
+          </button>
+          <button class="icon-btn" title="Settings">
+            <i data-lucide="settings" style="width: 18px; height: 18px"></i>
+          </button>
+          <button class="btn-primary" onclick="alert('Demo: Task Creation Modal would open here')">
+            <i data-lucide="plus" style="width: 18px; height: 18px"></i> New Task
+          </button>
+        </div>
+      </header>
+
+      <!-- Main Content Grid -->
+      <main class="content-body">
+        <!-- Left Section: Stats & Tasks -->
+        <section class="dashboard-main">
+          <!-- Glassmorphic Stat Widgets -->
+          <div class="stats-grid">
+            <div class="stat-card glass-panel">
+              <div class="stat-header">
+                <span>Productive Time</span>
+                <div class="stat-icon"><i data-lucide="clock" style="width: 16px; height: 16px"></i></div>
+              </div>
+              <div class="stat-value">2h 45m</div>
+              <div class="stat-sub positive">
+                <i data-lucide="trending-up" style="width: 14px; height: 14px"></i> +35m vs yesterday
+              </div>
+            </div>
+
+            <div class="stat-card glass-panel">
+              <div class="stat-header">
+                <span>Today's Tasks</span>
+                <div class="stat-icon"><i data-lucide="check-circle-2" style="width: 16px; height: 16px"></i></div>
+              </div>
+              <div class="stat-value">4 / 6</div>
+              <div class="stat-sub positive">
+                67% completion rate
+              </div>
+            </div>
+
+            <div class="stat-card glass-panel">
+              <div class="stat-header">
+                <span>Active Streaks</span>
+                <div class="stat-icon"><i data-lucide="flame" style="width: 16px; height: 16px; color: #f97316"></i></div>
+              </div>
+              <div class="stat-value">12 Days</div>
+              <div class="stat-sub">
+                🔥 DSA Problem Solving
+              </div>
+            </div>
+          </div>
+
+          <!-- Task Section -->
+          <div>
+            <div class="section-header">
+              <div class="section-title">
+                Today's Schedule <span class="badge-count">5 Tasks</span>
+              </div>
+              <div class="filter-pills">
+                <button class="pill active">All</button>
+                <button class="pill">One-Time</button>
+                <button class="pill">Recurring</button>
+              </div>
+            </div>
+
+            <div class="task-list">
+              <!-- Task Card 1: Recurring with Time Tracker & Streak -->
+              <div class="task-card glass-panel">
+                <div class="priority-indicator high" title="High Priority"></div>
+                <div class="custom-checkbox" onclick="this.parentElement.classList.toggle('completed')">
+                  <i data-lucide="check" style="width: 12px; height: 12px; color: #fff"></i>
+                </div>
+                <div class="task-main">
+                  <div class="task-title-row">
+                    <span class="task-title">DSA Practice — LeetCode Graphs</span>
+                    <span class="tag-badge">#daily</span>
+                    <span class="tag-badge">#coding</span>
+                  </div>
+                  <div class="task-meta">
+                    <span class="meta-item"><i data-lucide="folder" style="width: 13px; height: 13px"></i> DSA Prep</span>
+                    <span class="streak-badge">🔥 12 days</span>
+                  </div>
+                </div>
+
+                <div class="task-progress-box">
+                  <div class="task-progress-text">
+                    <span>45/60 min</span>
+                    <span>75%</span>
+                  </div>
+                  <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" style="width: 75%"></div>
+                  </div>
+                </div>
+
+                <div class="task-actions">
+                  <button class="task-btn timer-btn" title="Start Timer"><i data-lucide="play" style="width: 14px; height: 14px"></i></button>
+                  <button class="task-btn" title="Edit Task"><i data-lucide="edit-3" style="width: 14px; height: 14px"></i></button>
+                </div>
+              </div>
+
+              <!-- Task Card 2: One-Time Task Urgent -->
+              <div class="task-card glass-panel">
+                <div class="priority-indicator urgent" title="Urgent Priority"></div>
+                <div class="custom-checkbox" onclick="this.parentElement.classList.toggle('completed')">
+                  <i data-lucide="check" style="width: 12px; height: 12px; color: #fff"></i>
+                </div>
+                <div class="task-main">
+                  <div class="task-title-row">
+                    <span class="task-title">Submit RAG Architecture Report</span>
+                    <span class="tag-badge">#college</span>
+                  </div>
+                  <div class="task-meta">
+                    <span class="meta-item" style="color: #f87171"><i data-lucide="alert-circle" style="width: 13px; height: 13px"></i> Due Today, 6:00 PM</span>
+                    <span class="meta-item"><i data-lucide="clock" style="width: 13px; height: 13px"></i> Est. 2h</span>
+                  </div>
+                </div>
+
+                <div class="task-actions">
+                  <button class="task-btn timer-btn" title="Start Timer"><i data-lucide="play" style="width: 14px; height: 14px"></i></button>
+                  <button class="task-btn" title="Edit Task"><i data-lucide="edit-3" style="width: 14px; height: 14px"></i></button>
+                </div>
+              </div>
+
+              <!-- Task Card 3: Recurring Completed -->
+              <div class="task-card glass-panel completed">
+                <div class="priority-indicator medium" title="Medium Priority"></div>
+                <div class="custom-checkbox" onclick="this.parentElement.classList.toggle('completed')">
+                  <i data-lucide="check" style="width: 12px; height: 12px; color: #fff"></i>
+                </div>
+                <div class="task-main">
+                  <div class="task-title-row">
+                    <span class="task-title">Read ArXiv Paper on Attention Mechanism</span>
+                    <span class="tag-badge">#ai</span>
+                  </div>
+                  <div class="task-meta">
+                    <span class="meta-item"><i data-lucide="folder" style="width: 13px; height: 13px"></i> Personal</span>
+                    <span class="streak-badge">🔥 5 days</span>
+                  </div>
+                </div>
+
+                <div class="task-progress-box">
+                  <div class="task-progress-text">
+                    <span>30/30 min</span>
+                    <span>100%</span>
+                  </div>
+                  <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" style="width: 100%"></div>
+                  </div>
+                </div>
+
+                <div class="task-actions">
+                  <button class="task-btn timer-btn" title="Start Timer"><i data-lucide="play" style="width: 14px; height: 14px"></i></button>
+                  <button class="task-btn" title="Edit Task"><i data-lucide="edit-3" style="width: 14px; height: 14px"></i></button>
+                </div>
+              </div>
+
+              <!-- Task Card 4: One-Time Low Priority -->
+              <div class="task-card glass-panel">
+                <div class="priority-indicator low" title="Low Priority"></div>
+                <div class="custom-checkbox" onclick="this.parentElement.classList.toggle('completed')">
+                  <i data-lucide="check" style="width: 12px; height: 12px; color: #fff"></i>
+                </div>
+                <div class="task-main">
+                  <div class="task-title-row">
+                    <span class="task-title">Organize GitHub Repository Readme Files</span>
+                  </div>
+                  <div class="task-meta">
+                    <span class="meta-item"><i data-lucide="calendar" style="width: 13px; height: 13px"></i> Due Tomorrow</span>
+                  </div>
+                </div>
+
+                <div class="task-actions">
+                  <button class="task-btn timer-btn" title="Start Timer"><i data-lucide="play" style="width: 14px; height: 14px"></i></button>
+                  <button class="task-btn" title="Edit Task"><i data-lucide="edit-3" style="width: 14px; height: 14px"></i></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Right Sidebar Section Widgets -->
+        <aside class="dashboard-side">
+          <!-- Active Timer Widget -->
+          <div class="timer-widget glass-panel">
+            <div class="timer-label">Active Time Tracking</div>
+            <div class="timer-task-name">DSA Practice — LeetCode Graphs</div>
+            <div class="timer-digits">00:45:12</div>
+            <div class="timer-controls">
+              <button class="btn-timer-action btn-timer-start">
+                <i data-lucide="pause" style="width: 16px; height: 16px"></i> Pause
+              </button>
+              <button class="btn-timer-action btn-timer-stop">
+                <i data-lucide="square" style="width: 16px; height: 16px"></i> Stop
+              </button>
+            </div>
+          </div>
+
+          <!-- Overdue Warning Widget -->
+          <div class="overdue-box glass-panel">
+            <div class="overdue-title">
+              <i data-lucide="alert-triangle" style="width: 16px; height: 16px"></i> Overdue Tasks (1)
+            </div>
+            <div style="font-size: 0.85rem; font-weight: 500; margin-bottom: 4px;">Update Project Dependencies</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">Deadline was yesterday at 11:59 PM</div>
+          </div>
+
+          <!-- Mini Calendar Widget -->
+          <div class="mini-calendar glass-panel">
+            <div class="cal-header">
+              <span>August 2026</span>
+              <div style="display: flex; gap: 4px;">
+                <button class="task-btn"><i data-lucide="chevron-left" style="width: 14px; height: 14px"></i></button>
+                <button class="task-btn"><i data-lucide="chevron-right" style="width: 14px; height: 14px"></i></button>
+              </div>
+            </div>
+            
+            <div class="cal-grid">
+              <div class="cal-day-label">M</div>
+              <div class="cal-day-label">T</div>
+              <div class="cal-day-label">W</div>
+              <div class="cal-day-label">T</div>
+              <div class="cal-day-label">F</div>
+              <div class="cal-day-label">S</div>
+              <div class="cal-day-label">S</div>
+
+              <div class="cal-cell done-full">1</div>
+              <div class="cal-cell done-full">2</div>
+              <div class="cal-cell done-partial">3</div>
+              <div class="cal-cell done-full">4</div>
+              <div class="cal-cell done-full">5</div>
+              <div class="cal-cell done-full">6</div>
+              <div class="cal-cell done-partial">7</div>
+
+              <div class="cal-cell active-today">8</div>
+              <div class="cal-cell">9</div>
+              <div class="cal-cell">10</div>
+              <div class="cal-cell">11</div>
+              <div class="cal-cell">12</div>
+              <div class="cal-cell">13</div>
+              <div class="cal-cell">14</div>
+            </div>
+          </div>
+        </aside>
+      </main>
+    </div>
+  </div>
+
+  <!-- Mobile Bottom Navigation Bar -->
+  <nav class="mobile-nav">
+    <a href="#" class="mobile-tab active">
+      <i data-lucide="layout-dashboard" style="width: 20px; height: 20px;"></i>
+      <span>Home</span>
+    </a>
+    <a href="#" class="mobile-tab">
+      <i data-lucide="check-square" style="width: 20px; height: 20px;"></i>
+      <span>Tasks</span>
+    </a>
+    <a href="#" class="mobile-tab">
+      <i data-lucide="timer" style="width: 20px; height: 20px;"></i>
+      <span>Timer</span>
+    </a>
+    <a href="#" class="mobile-tab">
+      <i data-lucide="calendar" style="width: 20px; height: 20px;"></i>
+      <span>Calendar</span>
+    </a>
+    <a href="#" class="mobile-tab">
+      <i data-lucide="settings" style="width: 20px; height: 20px;"></i>
+      <span>Settings</span>
+    </a>
+  </nav>
+
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+  </script>
+</body>
+</html>
