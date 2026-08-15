@@ -80,7 +80,7 @@ If you wish to enable cloud sync with MongoDB:
 1. Create a `.env` file in the root directory:
    ```env
    MONGODB_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/taskflow?retryWrites=true&w=majority
-   JWT_SECRET=your_super_secret_jwt_key
+   MONGODB_DB=<database_name>
    ```
 2. Restart `npm run dev`.
 
