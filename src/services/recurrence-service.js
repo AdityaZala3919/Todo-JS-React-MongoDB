@@ -1,21 +1,35 @@
 import { OccurrenceRepository } from '../repositories/occurrence-repository.js';
 import { RecurrenceRepository } from '../repositories/recurrence-repository.js';
 import { TimeRepository } from '../repositories/time-repository.js';
-import { today } from '../utils/date.js';
+import { today, getDayOfWeek } from '../utils/date.js';
 
 export const RecurrenceService = {
   isTaskDueOn(rule, dateStr) {
     if (!rule) return false;
-    const dayOfWeek = new Date(dateStr).getDay();
+    const dayOfWeek = getDayOfWeek(dateStr);
     switch (rule.frequency) {
-      case 'daily': return true;
-      case 'weekly': return true;
+      case 'daily':
+        return true;
+      case 'weekly': {
+        let days = rule.days_of_week;
+        if (typeof days === 'string') {
+          try { days = JSON.parse(days); } catch { days = null; }
+        }
+        if (Array.isArray(days) && days.length > 0) {
+          return days.map(Number).includes(dayOfWeek);
+        }
+        const creationDay = getDayOfWeek(rule.created_at || today());
+        return dayOfWeek === creationDay;
+      }
       case 'selected_days': {
         let days = rule.days_of_week;
-        if (typeof days === 'string') { try { days = JSON.parse(days); } catch { return false; } }
-        return Array.isArray(days) && days.includes(dayOfWeek);
+        if (typeof days === 'string') {
+          try { days = JSON.parse(days); } catch { return false; }
+        }
+        return Array.isArray(days) && days.map(Number).includes(dayOfWeek);
       }
-      default: return false;
+      default:
+        return false;
     }
   },
   ensureOccurrence(taskId, dateStr) {

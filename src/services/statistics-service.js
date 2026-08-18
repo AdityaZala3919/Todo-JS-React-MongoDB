@@ -3,7 +3,7 @@ import { TimeRepository } from '../repositories/time-repository.js';
 import { OccurrenceRepository } from '../repositories/occurrence-repository.js';
 import { RecurrenceService } from './recurrence-service.js';
 import { Session } from './session.js';
-import { today, getWeekStart, getWeekEnd, formatDuration } from '../utils/date.js';
+import { today, getWeekStart, getWeekEnd, formatDuration, isSameDay } from '../utils/date.js';
 
 export const StatisticsService = {
   getDailyStats(date) {
@@ -11,7 +11,7 @@ export const StatisticsService = {
     const targetDate = date || today();
     const totalSeconds = TimeRepository.getTotalForDate(userId, targetDate);
     const allTasks = TaskRepository.getByUser(userId, { excludeStatus: 'archived' });
-    const completedToday = allTasks.filter((t) => t.completed_at && t.completed_at.startsWith(targetDate) && t.task_type === 'one_time').length;
+    const completedToday = allTasks.filter((t) => t.completed_at && isSameDay(t.completed_at, targetDate) && t.task_type === 'one_time').length;
     const recurringTasks = TaskRepository.getRecurring(userId);
     let recurringTotal = 0, recurringCompleted = 0;
     for (const task of recurringTasks) { const occ = OccurrenceRepository.getByTaskAndDate(task.id, targetDate); if (occ) { recurringTotal++; if (occ.status === 'completed') recurringCompleted++; } }

@@ -11,6 +11,13 @@
 .sub { font-size: var(--text-sm); color: var(--text-muted); margin-bottom: 20px; }
 .error { font-size: var(--text-sm); color: #f87171; background: rgba(248,113,113,0.08); padding: 10px 14px; border-radius: var(--radius-md); margin-bottom: 14px; border: 1px solid rgba(248,113,113,0.2); }
 .form { display: flex; flex-direction: column; gap: 12px; }
+.passwordWrap { position: relative; display: flex; align-items: center; width: 100%; }
+.passwordInput { width: 100%; padding-right: 42px !important; }
+.toggleBtn { position: absolute; right: 12px; background: none; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: var(--radius-sm); transition: color 0.15s ease; }
+.toggleBtn:hover { color: var(--text-primary); }
+.rememberRow { display: flex; align-items: center; gap: 8px; font-size: var(--text-xs); color: var(--text-muted); cursor: pointer; user-select: none; margin-top: -4px; }
+.rememberCheckbox { cursor: pointer; accent-color: var(--accent); width: 14px; height: 14px; }
 .switch { font-size: var(--text-sm); color: var(--text-muted); margin-top: 20px; text-align: center; }
 .switchBtn { color: var(--accent-bright); font-weight: 600; background: none; border: none; cursor: pointer; font-size: inherit; }
 .switchBtn:hover { text-decoration: underline; }
+

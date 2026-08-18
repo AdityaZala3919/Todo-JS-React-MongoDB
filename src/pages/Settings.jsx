@@ -87,12 +87,30 @@ export default function Settings() {
           </div>
           <form onSubmit={handleUpdateProfile} className={styles.form}>
             <div className={styles.inputGroup}>
-              <label>Email Address</label>
-              <input className="input" type="email" value={user?.email || ''} disabled style={{ opacity: 0.6 }} />
+              <label htmlFor="profile-email">Email Address</label>
+              <input
+                id="profile-email"
+                name="email"
+                className="input"
+                type="email"
+                autoComplete="email"
+                value={user?.email || ''}
+                disabled
+                style={{ opacity: 0.6 }}
+              />
             </div>
             <div className={styles.inputGroup}>
-              <label>Display Name</label>
-              <input className="input" type="text" value={displayName} onChange={(e) => setDisplayName(e.target.value)} required />
+              <label htmlFor="profile-name">Display Name</label>
+              <input
+                id="profile-name"
+                name="name"
+                className="input"
+                type="text"
+                autoComplete="name"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                required
+              />
             </div>
             <button className="btn btn-primary" type="submit" disabled={loading}>Update Profile</button>
           </form>
@@ -105,17 +123,54 @@ export default function Settings() {
             <h2>Security</h2>
           </div>
           <form onSubmit={handleChangePassword} className={styles.form}>
+            {/* Hidden username field to help password managers identify the account */}
+            <input
+              type="text"
+              name="username"
+              value={user?.email || ''}
+              autoComplete="username"
+              style={{ display: 'none' }}
+              readOnly
+              tabIndex={-1}
+            />
             <div className={styles.inputGroup}>
-              <label>Current Password</label>
-              <input className="input" type="text" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} required />
+              <label htmlFor="current-password">Current Password</label>
+              <input
+                id="current-password"
+                name="current-password"
+                className="input"
+                type="password"
+                autoComplete="current-password"
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
+                required
+              />
             </div>
             <div className={styles.inputGroup}>
-              <label>New Password</label>
-              <input className="input" type="text" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
+              <label htmlFor="new-password">New Password</label>
+              <input
+                id="new-password"
+                name="new-password"
+                className="input"
+                type="password"
+                autoComplete="new-password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                required
+              />
             </div>
             <div className={styles.inputGroup}>
-              <label>Confirm New Password</label>
-              <input className="input" type="text" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
+              <label htmlFor="confirm-password">Confirm New Password</label>
+              <input
+                id="confirm-password"
+                name="confirm-password"
+                className="input"
+                type="password"
+                autoComplete="new-password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
             </div>
             <button className="btn btn-primary" type="submit" disabled={loading}>Change Password</button>
           </form>

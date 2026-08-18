@@ -5,7 +5,7 @@ import { TagRepository } from '../repositories/tag-repository.js';
 import { Session } from './session.js';
 import { EventBus, Events } from './events.js';
 import { validateTask } from '../utils/validation.js';
-import { today, now } from '../utils/date.js';
+import { today, now, isToday, getDayOfWeek } from '../utils/date.js';
 
 export const TaskService = {
   createOneTimeTask(data) {
@@ -54,12 +54,25 @@ export const TaskService = {
   getTodaysTasks() {
     const userId = Session.getCurrentUserId(); if (!userId) return { oneTime: [], recurring: [] };
     const todayStr = today();
-    const oneTime = TaskRepository.getByUser(userId, { task_type: 'one_time', excludeStatus: 'archived', sort: 'priority' });
+    const allOneTime = TaskRepository.getByUser(userId, { task_type: 'one_time', excludeStatus: 'archived', sort: 'priority' });
+    const oneTime = allOneTime.filter((task) => {
+      // Incomplete tasks remain on the dashboard
+      if (task.status !== 'completed') return true;
+      // Completed tasks only appear on the dashboard if completed today
+      return Boolean(task.completed_at && isToday(task.completed_at));
+    });
     const recurringTasks = TaskRepository.getRecurring(userId);
     const recurring = recurringTasks.map((task) => {
+      const isDueToday = this._isTaskDueOn(task, todayStr);
       let occurrence = OccurrenceRepository.getByTaskAndDate(task.id, todayStr);
-      if (!occurrence && this._isTaskDueOn(task, todayStr)) occurrence = OccurrenceRepository.create({ task_id: task.id, occurrence_date: todayStr });
-      const tags = TagRepository.getTagsForTask(task.id); return { ...task, occurrence, tags };
+      if (!occurrence && isDueToday) {
+        occurrence = OccurrenceRepository.create({ task_id: task.id, occurrence_date: todayStr });
+      }
+      if (!isDueToday && (!occurrence || occurrence.status !== 'completed')) {
+        occurrence = null;
+      }
+      const tags = TagRepository.getTagsForTask(task.id);
+      return { ...task, occurrence, tags };
     }).filter((t) => t.occurrence);
     const enrichedOneTime = oneTime.map((task) => ({ ...task, tags: TagRepository.getTagsForTask(task.id) }));
     return { oneTime: enrichedOneTime, recurring };
@@ -75,12 +88,36 @@ export const TaskService = {
   getOverdueTasks() { const userId = Session.getCurrentUserId(); return userId ? TaskRepository.getOverdue(userId) : []; },
   searchTasks(query) { const userId = Session.getCurrentUserId(); return userId ? TaskRepository.search(userId, query) : []; },
   _isTaskDueOn(taskOrData, dateStr) {
-    const freq = taskOrData.frequency; if (!freq) return false; if (freq === 'daily') return true;
-    if (freq === 'weekly') return true;
+    if (!taskOrData) return false;
+    const freq = taskOrData.frequency;
+    if (!freq) return false;
+    if (freq === 'daily') return true;
+
+    const dayOfWeek = getDayOfWeek(dateStr);
+
     if (freq === 'selected_days') {
-      let days = taskOrData.days_of_week; if (typeof days === 'string') { try { days = JSON.parse(days); } catch { return false; } }
-      if (Array.isArray(days)) return days.includes(new Date(dateStr).getDay());
+      let days = taskOrData.days_of_week;
+      if (typeof days === 'string') {
+        try { days = JSON.parse(days); } catch { return false; }
+      }
+      if (Array.isArray(days)) {
+        return days.map(Number).includes(dayOfWeek);
+      }
+      return false;
     }
+
+    if (freq === 'weekly') {
+      let days = taskOrData.days_of_week;
+      if (typeof days === 'string') {
+        try { days = JSON.parse(days); } catch { days = null; }
+      }
+      if (Array.isArray(days) && days.length > 0) {
+        return days.map(Number).includes(dayOfWeek);
+      }
+      const creationDay = getDayOfWeek(taskOrData.created_at || taskOrData.start_date || today());
+      return dayOfWeek === creationDay;
+    }
+
     return false;
   },
   updateSortOrders(items) { TaskRepository.updateSortOrders(items); },

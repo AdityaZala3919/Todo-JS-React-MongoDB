@@ -2,7 +2,11 @@
  * Date utilities — Formatting, comparison, and helper functions
  */
 export function today() {
-  return new Date().toISOString().split('T')[0];
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 export function now() {
@@ -69,19 +73,47 @@ export function formatTimer(totalSeconds) {
 }
 
 export function isToday(dateStr) {
-  return dateStr?.split('T')[0] === today();
+  if (!dateStr) return false;
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return false;
+  const n = new Date();
+  return (
+    d.getFullYear() === n.getFullYear() &&
+    d.getMonth() === n.getMonth() &&
+    d.getDate() === n.getDate()
+  );
 }
 
 export function isPast(dateStr) {
   if (!dateStr) return false;
-  return new Date(dateStr) < new Date(today());
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return false;
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+  return d < todayStart;
 }
 
 export function isSameDay(a, b) {
-  return a?.split('T')[0] === b?.split('T')[0];
+  if (!a || !b) return false;
+  const da = new Date(a);
+  const db = new Date(b);
+  if (isNaN(da.getTime()) || isNaN(db.getTime())) return false;
+  return (
+    da.getFullYear() === db.getFullYear() &&
+    da.getMonth() === db.getMonth() &&
+    da.getDate() === db.getDate()
+  );
 }
 
 export function getDayOfWeek(dateStr) {
+  if (!dateStr) return new Date().getDay();
+  const parts = dateStr.split('T')[0].split('-');
+  if (parts.length === 3) {
+    const year = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1;
+    const day = parseInt(parts[2], 10);
+    return new Date(year, month, day).getDay();
+  }
   return new Date(dateStr).getDay();
 }
 
