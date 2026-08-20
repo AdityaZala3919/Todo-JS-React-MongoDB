@@ -1,6 +1,56 @@
 import { connectToDatabase } from './_db.js';
 import bcrypt from 'bcryptjs';
 
+function getPreconfiguredUsers() {
+    const users = [];
+
+    // 1. Check PRECONFIGURED_USERS JSON string
+    if (process.env.PRECONFIGURED_USERS) {
+        try {
+            const parsed = JSON.parse(process.env.PRECONFIGURED_USERS);
+            if (Array.isArray(parsed)) {
+                users.push(...parsed);
+            }
+        } catch (e) {
+            console.warn('[API Auth] Failed to parse PRECONFIGURED_USERS env variable:', e.message);
+        }
+    }
+
+    // 2. Also check numbered environment variables (e.g. USER_1_EMAIL, USER_1_PASSWORD / USER_1_HASH, etc.)
+    for (let i = 1; i <= 20; i++) {
+        const email = process.env[`USER_${i}_EMAIL`];
+        const passwordHash = process.env[`USER_${i}_HASH`] || process.env[`USER_${i}_PASSWORD_HASH`];
+        const plainPassword = process.env[`USER_${i}_PASSWORD`];
+        const id = process.env[`USER_${i}_ID`];
+        const displayName = process.env[`USER_${i}_NAME`] || process.env[`USER_${i}_DISPLAY_NAME`];
+
+        if (email && (passwordHash || plainPassword)) {
+            users.push({
+                id: id || `static-user-${i}`,
+                email: email.toLowerCase().trim(),
+                password_hash: passwordHash,
+                password: plainPassword,
+                display_name: displayName || email.split('@')[0],
+            });
+        }
+    }
+
+    return users;
+}
+
+async function verifyStaticUserPassword(staticUser, inputPassword) {
+    if (staticUser.password_hash) {
+        if (staticUser.password_hash.startsWith('$2a$') || staticUser.password_hash.startsWith('$2b$') || staticUser.password_hash.startsWith('$2y$')) {
+            return await bcrypt.compare(inputPassword, staticUser.password_hash);
+        }
+        return inputPassword === staticUser.password_hash;
+    }
+    if (staticUser.password) {
+        return inputPassword === staticUser.password;
+    }
+    return false;
+}
+
 export default async (req, res) => {
     // Standard CORS headers for serverless environment
     res.setHeader('Access-Control-Allow-Credentials', true);
@@ -20,14 +70,28 @@ export default async (req, res) => {
     const { action, id } = req.query;
 
     try {
-        const { db } = await connectToDatabase();
-        const usersCollection = db.collection('users');
-
         // GET: Get user profile details
         if (method === 'GET') {
             if (!id) {
                 return res.status(400).json({ error: 'User ID is required' });
             }
+
+            // Check preconfigured users first
+            const staticUsers = getPreconfiguredUsers();
+            const staticUser = staticUsers.find(u => u.id === id);
+            if (staticUser) {
+                const { password_hash, password: p, ...safeUser } = staticUser;
+                return res.status(200).json({
+                    id: safeUser.id,
+                    email: safeUser.email,
+                    display_name: safeUser.display_name,
+                    created_at: safeUser.created_at || new Date().toISOString(),
+                    updated_at: safeUser.updated_at || new Date().toISOString(),
+                });
+            }
+
+            const { db } = await connectToDatabase();
+            const usersCollection = db.collection('users');
             const user = await usersCollection.findOne({ _id: id });
             if (!user) {
                 return res.status(404).json({ error: 'User not found' });
@@ -47,6 +111,9 @@ export default async (req, res) => {
                 if (!email || !password || !clientUserId) {
                     return res.status(400).json({ error: 'Email, password, and client ID are required' });
                 }
+
+                const { db } = await connectToDatabase();
+                const usersCollection = db.collection('users');
 
                 const existing = await usersCollection.findOne({ email: email.toLowerCase() });
                 if (existing) {
@@ -76,7 +143,30 @@ export default async (req, res) => {
                     return res.status(400).json({ error: 'Email and password are required' });
                 }
 
-                const user = await usersCollection.findOne({ email: email.toLowerCase() });
+                const cleanEmail = email.toLowerCase().trim();
+
+                // 1. Fast-path: Check static / preconfigured env users before opening MongoDB connection
+                const staticUsers = getPreconfiguredUsers();
+                const staticUser = staticUsers.find(u => u.email.toLowerCase() === cleanEmail);
+
+                if (staticUser) {
+                    const isValid = await verifyStaticUserPassword(staticUser, password);
+                    if (isValid) {
+                        const { password_hash, password: p, ...safeUser } = staticUser;
+                        return res.status(200).json({
+                            id: safeUser.id,
+                            email: safeUser.email,
+                            display_name: safeUser.display_name,
+                            created_at: safeUser.created_at || new Date().toISOString(),
+                            updated_at: safeUser.updated_at || new Date().toISOString(),
+                        });
+                    }
+                }
+
+                // 2. Fallback to MongoDB
+                const { db } = await connectToDatabase();
+                const usersCollection = db.collection('users');
+                const user = await usersCollection.findOne({ email: cleanEmail });
                 if (!user) {
                     return res.status(400).json({ error: 'Invalid email or password' });
                 }
@@ -96,6 +186,9 @@ export default async (req, res) => {
                 if (!user_id || !old_password || !new_password) {
                     return res.status(400).json({ error: 'Missing required fields' });
                 }
+
+                const { db } = await connectToDatabase();
+                const usersCollection = db.collection('users');
 
                 const user = await usersCollection.findOne({ _id: user_id });
                 if (!user) {
@@ -121,6 +214,9 @@ export default async (req, res) => {
                 if (!user_id || !display_name) {
                     return res.status(400).json({ error: 'User ID and display name are required' });
                 }
+
+                const { db } = await connectToDatabase();
+                const usersCollection = db.collection('users');
 
                 await usersCollection.updateOne(
                     { _id: user_id },

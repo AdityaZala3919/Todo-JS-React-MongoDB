@@ -25,20 +25,31 @@ export default async (req, res) => {
     try {
         const { db } = await connectToDatabase();
 
-        // 1. Fetch user-owned collections directly
-        const user = await db.collection('users').findOne({ _id: userId });
+        // 1. Fetch primary collections concurrently using Promise.all for high performance
+        const [
+            userDoc,
+            projects,
+            tags,
+            tasks,
+            time_sessions,
+            existingSettingsDoc
+        ] = await Promise.all([
+            db.collection('users').findOne({ _id: userId }),
+            db.collection('projects').find({ user_id: userId }).toArray(),
+            db.collection('tags').find({ user_id: userId }).toArray(),
+            db.collection('tasks').find({ user_id: userId }).toArray(),
+            db.collection('time_sessions').find({ user_id: userId }).toArray(),
+            db.collection('user_settings').findOne({ _id: userId }),
+        ]);
+
+        let user = userDoc;
         if (user) {
             delete user.password_hash;
             user.id = user._id;
         }
         const users = user ? [user] : [];
 
-        const projects = await db.collection('projects').find({ user_id: userId }).toArray();
-        const tags = await db.collection('tags').find({ user_id: userId }).toArray();
-        const tasks = await db.collection('tasks').find({ user_id: userId }).toArray();
-        const time_sessions = await db.collection('time_sessions').find({ user_id: userId }).toArray();
-        
-        let userSettingsDoc = await db.collection('user_settings').findOne({ _id: userId });
+        let userSettingsDoc = existingSettingsDoc;
         if (!userSettingsDoc) {
             // Instantiate default settings in DB if not found
             userSettingsDoc = {
@@ -53,7 +64,7 @@ export default async (req, res) => {
             await db.collection('user_settings').insertOne(userSettingsDoc);
         }
 
-        // Extract task IDs to resolve linked task properties (occurrences, recurrence rules, and tags)
+        // Extract task IDs to resolve linked task properties concurrently
         const taskIds = tasks.map(t => t._id || t.id);
 
         let recurrence_rules = [];
@@ -61,12 +72,11 @@ export default async (req, res) => {
         let task_occurrences = [];
 
         if (taskIds.length > 0) {
-            recurrence_rules = await db.collection('recurrence_rules')
-                .find({ task_id: { $in: taskIds } }).toArray();
-            task_tags = await db.collection('task_tags')
-                .find({ task_id: { $in: taskIds } }).toArray();
-            task_occurrences = await db.collection('task_occurrences')
-                .find({ task_id: { $in: taskIds } }).toArray();
+            [recurrence_rules, task_tags, task_occurrences] = await Promise.all([
+                db.collection('recurrence_rules').find({ task_id: { $in: taskIds } }).toArray(),
+                db.collection('task_tags').find({ task_id: { $in: taskIds } }).toArray(),
+                db.collection('task_occurrences').find({ task_id: { $in: taskIds } }).toArray(),
+            ]);
         }
 
         // Respond with all datasets mapped together
