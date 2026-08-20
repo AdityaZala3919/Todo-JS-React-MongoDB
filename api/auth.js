@@ -7,7 +7,12 @@ function getPreconfiguredUsers() {
     // 1. Check PRECONFIGURED_USERS JSON string
     if (process.env.PRECONFIGURED_USERS) {
         try {
-            const parsed = JSON.parse(process.env.PRECONFIGURED_USERS);
+            let raw = process.env.PRECONFIGURED_USERS.trim();
+            // Strip leading and trailing single or double quotes if present
+            if ((raw.startsWith("'") && raw.endsWith("'")) || (raw.startsWith('"') && raw.endsWith('"'))) {
+                raw = raw.slice(1, -1).trim();
+            }
+            const parsed = JSON.parse(raw);
             if (Array.isArray(parsed)) {
                 users.push(...parsed);
             }
