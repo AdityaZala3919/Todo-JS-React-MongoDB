@@ -1,9 +1,10 @@
 import { useMemo, useEffect } from 'react';
-import { Clock, CheckCircle2, Flame, Play, Pause, Square, Plus, AlertTriangle, Inbox, Edit3, Archive } from 'lucide-react';
+import { Clock, CheckCircle2, Flame, Play, Pause, Square, Plus, AlertTriangle, Inbox, Edit3, Archive, BookOpen, Quote } from 'lucide-react';
 import { useTaskStore } from '../stores/taskStore';
 import { useTimerStore } from '../stores/timerStore';
 import { StatisticsService } from '../services/statistics-service';
 import { RecurrenceService } from '../services/recurrence-service';
+import { VerseService } from '../services/verse-service';
 import { formatTimer, formatDate, formatDuration, MONTH_NAMES } from '../utils/date';
 import { toast } from '../components/UI/Toast';
 import styles from './Dashboard.module.css';
@@ -13,6 +14,8 @@ export default function Dashboard({ onNewTask }) {
   const timer = useTimerStore();
 
   useEffect(() => { timer.subscribe(); return () => timer.unsubscribe(); }, []);
+
+  const todaysVerse = useMemo(() => VerseService.getTodaysVerse(), []);
 
   const data = useMemo(() => {
     const { oneTime, recurring } = useTaskStore.getState().getTodaysTasks();
@@ -56,6 +59,31 @@ export default function Dashboard({ onNewTask }) {
             <div className={styles.statSub}>{data.bestStreak > 0 ? `🔥 ${data.bestTask}` : 'Start a streak!'}</div>
           </div>
         </div>
+
+        {/* Daily Verse / Wisdom Card */}
+        {todaysVerse && (
+          <div className={`${styles.verseCard} glass`}>
+            <div className={styles.verseGlow} />
+            <div className={styles.verseHeader}>
+              <div className={styles.verseTitleGroup}>
+                <div className={styles.verseIconWrap}>
+                  <BookOpen size={13} />
+                </div>
+                <span className={styles.verseTag}>Daily Wisdom</span>
+                <span className={styles.verseDivider}>•</span>
+                <span className={styles.verseBadge}>
+                  Chapter {todaysVerse.chapter}, Verse {todaysVerse.verse}
+                </span>
+              </div>
+              <span className={styles.verseSource}>Chanakya Niti</span>
+            </div>
+
+            <div className={styles.verseBody}>
+              <Quote size={18} className={styles.quoteIcon} />
+              <p className={styles.verseText}>"{todaysVerse.text}"</p>
+            </div>
+          </div>
+        )}
 
         {/* Today's Tasks */}
         <div className={styles.section}>
