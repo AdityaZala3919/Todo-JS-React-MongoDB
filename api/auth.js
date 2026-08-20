@@ -85,6 +85,7 @@ export default async (req, res) => {
             const staticUsers = getPreconfiguredUsers();
             const staticUser = staticUsers.find(u => u.id === id);
             if (staticUser) {
+                console.log(`[API Auth] ⚡ Profile fetched for user ID "${id}" directly from .env`);
                 const { password_hash, password: p, ...safeUser } = staticUser;
                 return res.status(200).json({
                     id: safeUser.id,
@@ -157,6 +158,7 @@ export default async (req, res) => {
                 if (staticUser) {
                     const isValid = await verifyStaticUserPassword(staticUser, password);
                     if (isValid) {
+                        console.log(`[API Auth] ⚡ Login successful: Authenticated "${cleanEmail}" directly from .env (bypassed MongoDB)`);
                         const { password_hash, password: p, ...safeUser } = staticUser;
                         return res.status(200).json({
                             id: safeUser.id,
@@ -169,6 +171,7 @@ export default async (req, res) => {
                 }
 
                 // 2. Fallback to MongoDB
+                console.log(`[API Auth] 🍃 .env match not found, connecting to MongoDB for: "${cleanEmail}"`);
                 const { db } = await connectToDatabase();
                 const usersCollection = db.collection('users');
                 const user = await usersCollection.findOne({ email: cleanEmail });
