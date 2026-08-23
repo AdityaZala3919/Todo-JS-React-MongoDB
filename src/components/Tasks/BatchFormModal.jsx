@@ -1,34 +1,33 @@
 import { useState } from 'react';
 import { X, Layers, Plus, Trash2, Copy, Sparkles } from 'lucide-react';
 import { useTaskStore } from '../../stores/taskStore';
-import { TagRepository } from '../../repositories/tag-repository';
 import { ProjectRepository } from '../../repositories/project-repository';
 import { Session } from '../../services/session';
 import { toast } from '../UI/Toast';
 import styles from './BatchFormModal.module.css';
 
-const DEFAULT_ROW = {
-  id: 1,
+const createEmptyRow = () => ({
+  id: Date.now() + Math.random(),
   title: '',
   priority: 'medium',
   estimated_duration: '',
-  deadline: '',
   project_id: '',
-};
+});
 
 export default function BatchFormModal({ onClose }) {
   const { createBulkTasks } = useTaskStore();
   const [rows, setRows] = useState([
-    { ...DEFAULT_ROW, id: Date.now() },
-    { ...DEFAULT_ROW, id: Date.now() + 1 },
-    { ...DEFAULT_ROW, id: Date.now() + 2 }
+    createEmptyRow(),
+    createEmptyRow(),
+    createEmptyRow(),
   ]);
 
   const userId = Session.getCurrentUserId();
   const projects = userId ? ProjectRepository.getByUser(userId) : [];
+  const hasProjects = projects.length > 0;
 
   const handleAddRow = () => {
-    setRows((prev) => [...prev, { ...DEFAULT_ROW, id: Date.now() + Math.random() }]);
+    setRows((prev) => [...prev, createEmptyRow()]);
   };
 
   const handleDuplicateRow = (index) => {
@@ -71,7 +70,6 @@ export default function BatchFormModal({ onClose }) {
           project_id: r.project_id || undefined,
         };
         if (r.estimated_duration) item.estimated_duration = Number(r.estimated_duration);
-        if (r.deadline) item.deadline = r.deadline;
         return item;
       });
 
@@ -93,7 +91,7 @@ export default function BatchFormModal({ onClose }) {
             </div>
             <div>
               <h2>Batch Task Creator</h2>
-              <p className={styles.subtitle}>Define multiple structured tasks with custom options</p>
+              <p className={styles.subtitle}>Create multiple tasks simultaneously with customized options</p>
             </div>
           </div>
           <button className={styles.closeBtn} onClick={onClose} aria-label="Close">
@@ -102,88 +100,108 @@ export default function BatchFormModal({ onClose }) {
         </div>
 
         <form onSubmit={handleSubmit} className={styles.form}>
-          <div className={styles.tableHeader}>
-            <span className={styles.colTitle}>Task Title</span>
-            <span className={styles.colPriority}>Priority</span>
-            <span className={styles.colDuration}>Est. Min</span>
-            {projects.length > 0 && <span className={styles.colProject}>Project</span>}
-            <span className={styles.colActions}>Actions</span>
-          </div>
+          <div className={`${styles.tableGrid} ${hasProjects ? styles.withProjects : styles.noProjects}`}>
+            <div className={styles.tableHeader}>
+              <span className={styles.colIndex}>#</span>
+              <span className={styles.colTitle}>Task Title</span>
+              <span className={styles.colPriority}>Priority</span>
+              <span className={styles.colDuration}>Est. Min</span>
+              {hasProjects && <span className={styles.colProject}>Project</span>}
+              <span className={styles.colActions}>Actions</span>
+            </div>
 
-          <div className={styles.rowList}>
-            {rows.map((row, index) => (
-              <div key={row.id} className={styles.taskRow}>
-                <div className={styles.rowNumber}>{index + 1}</div>
-                <input
-                  type="text"
-                  className={`input ${styles.titleInput}`}
-                  placeholder="Task title..."
-                  value={row.title}
-                  onChange={(e) => updateRow(row.id, 'title', e.target.value)}
-                  autoFocus={index === 0}
-                />
-                <select
-                  className={`input ${styles.prioritySelect}`}
-                  value={row.priority}
-                  onChange={(e) => updateRow(row.id, 'priority', e.target.value)}
-                >
-                  <option value="low">Low</option>
-                  <option value="medium">Med</option>
-                  <option value="high">High</option>
-                  <option value="urgent">Urgent</option>
-                </select>
-                <input
-                  type="number"
-                  className={`input ${styles.durationInput}`}
-                  placeholder="30"
-                  value={row.estimated_duration}
-                  onChange={(e) => updateRow(row.id, 'estimated_duration', e.target.value)}
-                  min="0"
-                />
-                {projects.length > 0 && (
-                  <select
-                    className={`input ${styles.projectSelect}`}
-                    value={row.project_id}
-                    onChange={(e) => updateRow(row.id, 'project_id', e.target.value)}
-                  >
-                    <option value="">None</option>
-                    {projects.map((p) => (
-                      <option key={p.id} value={p.id}>{p.name}</option>
-                    ))}
-                  </select>
-                )}
-                <div className={styles.rowButtons}>
-                  <button
-                    type="button"
-                    className={styles.iconBtn}
-                    onClick={() => handleDuplicateRow(index)}
-                    title="Duplicate row"
-                  >
-                    <Copy size={14} />
-                  </button>
-                  <button
-                    type="button"
-                    className={`${styles.iconBtn} ${styles.deleteBtn}`}
-                    onClick={() => handleRemoveRow(row.id)}
-                    title="Remove row"
-                  >
-                    <Trash2 size={14} />
-                  </button>
+            <div className={styles.rowList}>
+              {rows.map((row, index) => (
+                <div key={row.id} className={styles.taskRow}>
+                  <div className={styles.colIndex}>
+                    <span className={styles.indexBadge}>{index + 1}</span>
+                  </div>
+                  
+                  <div className={styles.colTitle}>
+                    <input
+                      type="text"
+                      className={styles.titleInput}
+                      placeholder="What needs to be done?"
+                      value={row.title}
+                      onChange={(e) => updateRow(row.id, 'title', e.target.value)}
+                      autoFocus={index === 0}
+                    />
+                  </div>
+
+                  <div className={styles.colPriority}>
+                    <select
+                      className={`${styles.selectInput} ${styles['p_' + row.priority]}`}
+                      value={row.priority}
+                      onChange={(e) => updateRow(row.id, 'priority', e.target.value)}
+                    >
+                      <option value="low">Low</option>
+                      <option value="medium">Medium</option>
+                      <option value="high">High</option>
+                      <option value="urgent">Urgent</option>
+                    </select>
+                  </div>
+
+                  <div className={styles.colDuration}>
+                    <input
+                      type="number"
+                      className={styles.durationInput}
+                      placeholder="30m"
+                      value={row.estimated_duration}
+                      onChange={(e) => updateRow(row.id, 'estimated_duration', e.target.value)}
+                      min="0"
+                    />
+                  </div>
+
+                  {hasProjects && (
+                    <div className={styles.colProject}>
+                      <select
+                        className={styles.selectInput}
+                        value={row.project_id}
+                        onChange={(e) => updateRow(row.id, 'project_id', e.target.value)}
+                      >
+                        <option value="">None</option>
+                        {projects.map((p) => (
+                          <option key={p.id} value={p.id}>{p.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  <div className={styles.colActions}>
+                    <div className={styles.actionBtns}>
+                      <button
+                        type="button"
+                        className={styles.iconBtn}
+                        onClick={() => handleDuplicateRow(index)}
+                        title="Duplicate row"
+                      >
+                        <Copy size={13} />
+                      </button>
+                      <button
+                        type="button"
+                        className={`${styles.iconBtn} ${styles.deleteBtn}`}
+                        onClick={() => handleRemoveRow(row.id)}
+                        title="Remove row"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
-          <div className={styles.rowControls}>
+          <div className={styles.footerBar}>
             <button
               type="button"
-              className="btn btn-secondary btn-sm"
+              className={styles.addRowBtn}
               onClick={handleAddRow}
             >
               <Plus size={14} /> Add Another Task Row
             </button>
             <span className={styles.validStatus}>
-              {validCount} of {rows.length} valid
+              <strong>{validCount}</strong> of <strong>{rows.length}</strong> tasks ready
             </span>
           </div>
 
@@ -205,3 +223,5 @@ export default function BatchFormModal({ onClose }) {
     </div>
   );
 }
+
+export { BatchFormModal };

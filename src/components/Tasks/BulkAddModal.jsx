@@ -239,3 +239,5 @@ export default function BulkAddModal({ onClose }) {
     </div>
   );
 }
+
+export { BulkAddModal };
