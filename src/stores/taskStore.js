@@ -13,6 +13,18 @@ export const useTaskStore = create((set, get) => ({
 
   createOneTimeTask: (data) => { const task = TaskService.createOneTimeTask(data); get().refresh(); return task; },
   createRecurringTask: (data) => { const task = TaskService.createRecurringTask(data); get().refresh(); return task; },
+  createBulkTasks: (tasks) => {
+    const created = [];
+    for (const item of tasks) {
+      if (item.task_type === 'recurring') {
+        created.push(TaskService.createRecurringTask(item));
+      } else {
+        created.push(TaskService.createOneTimeTask(item));
+      }
+    }
+    get().refresh();
+    return created;
+  },
   updateTask: (id, data) => { TaskService.updateTask(id, data); get().refresh(); },
   toggleCompletion: (taskId, occId) => { TaskService.toggleCompletion(taskId, occId); get().refresh(); },
   archiveTask: (taskId) => { TaskService.archiveTask(taskId); get().refresh(); },

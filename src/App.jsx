@@ -5,6 +5,8 @@ import Sidebar from './components/Layout/Sidebar';
 import TopBar from './components/Layout/TopBar';
 import MobileNav from './components/Layout/MobileNav';
 import TaskForm from './components/Tasks/TaskForm';
+import BulkAddModal from './components/Tasks/BulkAddModal';
+import BatchFormModal from './components/Tasks/BatchFormModal';
 import ToastContainer from './components/UI/Toast';
 
 // Pages
@@ -19,6 +21,8 @@ import Auth from './pages/Auth';
 export default function App() {
   const { init, isLoggedIn, loading } = useAuthStore();
   const [showTaskForm, setShowTaskForm] = useState(false);
+  const [showBulkAdd, setShowBulkAdd] = useState(false);
+  const [showBatchAdd, setShowBatchAdd] = useState(false);
 
   useEffect(() => {
     init();
@@ -54,10 +58,23 @@ export default function App() {
     <div style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column' }}>
       <Sidebar />
       <div style={{ marginLeft: 'var(--sidebar-width)', flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-        <TopBar onNewTask={() => setShowTaskForm(true)} />
+        <TopBar
+          onNewTask={() => setShowTaskForm(true)}
+          onBulkAdd={() => setShowBulkAdd(true)}
+          onBatchAdd={() => setShowBatchAdd(true)}
+        />
         <main style={{ flex: 1, overflowY: 'auto' }}>
           <Routes>
-            <Route path="/dashboard" element={<Dashboard onNewTask={() => setShowTaskForm(true)} />} />
+            <Route
+              path="/dashboard"
+              element={
+                <Dashboard
+                  onNewTask={() => setShowTaskForm(true)}
+                  onBulkAdd={() => setShowBulkAdd(true)}
+                  onBatchAdd={() => setShowBatchAdd(true)}
+                />
+              }
+            />
             <Route path="/tasks" element={<Tasks onNewTask={() => setShowTaskForm(true)} />} />
             <Route path="/timer" element={<Timer />} />
             <Route path="/calendar" element={<Calendar />} />
@@ -69,6 +86,8 @@ export default function App() {
       </div>
       <MobileNav />
       {showTaskForm && <TaskForm onClose={() => setShowTaskForm(false)} />}
+      {showBulkAdd && <BulkAddModal onClose={() => setShowBulkAdd(false)} />}
+      {showBatchAdd && <BatchFormModal onClose={() => setShowBatchAdd(false)} />}
       <ToastContainer />
 
       <style>{`

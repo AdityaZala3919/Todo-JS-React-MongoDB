@@ -1,5 +1,5 @@
 import { useMemo, useEffect } from 'react';
-import { Clock, CheckCircle2, Flame, Play, Pause, Square, Plus, AlertTriangle, Inbox, Edit3, Archive, BookOpen, Quote } from 'lucide-react';
+import { Clock, CheckCircle2, Flame, Play, Pause, Square, Plus, ListPlus, Layers, AlertTriangle, Inbox, Edit3, Archive, BookOpen, Quote } from 'lucide-react';
 import { useTaskStore } from '../stores/taskStore';
 import { useTimerStore } from '../stores/timerStore';
 import { StatisticsService } from '../services/statistics-service';
@@ -9,7 +9,7 @@ import { formatTimer, formatDate, formatDuration, MONTH_NAMES } from '../utils/d
 import { toast } from '../components/UI/Toast';
 import styles from './Dashboard.module.css';
 
-export default function Dashboard({ onNewTask }) {
+export default function Dashboard({ onNewTask, onBulkAdd, onBatchAdd }) {
   const { refreshKey, toggleCompletion, archiveTask, restoreTask } = useTaskStore();
   const timer = useTimerStore();
 
@@ -89,7 +89,17 @@ export default function Dashboard({ onNewTask }) {
         <div className={styles.section}>
           <div className={styles.sectionHeader}>
             <h2 className={styles.sectionTitle}>Today's Schedule <span className={styles.badge}>{data.totalCount}</span></h2>
-            <button className="btn btn-primary btn-sm" onClick={onNewTask}><Plus size={14} /> New Task</button>
+            <div className={styles.headerButtons}>
+              <button className="btn btn-secondary btn-sm" onClick={onBulkAdd} title="Quick paste multiple tasks">
+                <ListPlus size={14} /> Bulk Add
+              </button>
+              <button className="btn btn-secondary btn-sm" onClick={onBatchAdd} title="Add multiple structured tasks">
+                <Layers size={14} /> Batch Form
+              </button>
+              <button className="btn btn-primary btn-sm" onClick={onNewTask} title="Create single task">
+                <Plus size={14} /> New Task
+              </button>
+            </div>
           </div>
 
           {data.overdue.length > 0 && (
