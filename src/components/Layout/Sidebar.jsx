@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { LayoutDashboard, ListTodo, Timer, CalendarDays, BarChart3, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, ListTodo, Timer, CalendarDays, BarChart3, Target, Settings, LogOut } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import styles from './Sidebar.module.css';
 
@@ -9,6 +9,7 @@ const navItems = [
   { to: '/timer', icon: Timer, label: 'Timer' },
   { to: '/calendar', icon: CalendarDays, label: 'Calendar' },
   { to: '/statistics', icon: BarChart3, label: 'Statistics' },
+  { to: '/swot', icon: Target, label: 'SWOT Analysis' },
 ];
 
 export default function Sidebar() {

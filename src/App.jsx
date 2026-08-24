@@ -15,6 +15,7 @@ import Tasks from './pages/Tasks';
 import Timer from './pages/Timer';
 import Calendar from './pages/Calendar';
 import Statistics from './pages/Statistics';
+import SWOT from './pages/SWOT';
 import Settings from './pages/Settings';
 import Auth from './pages/Auth';
 
@@ -79,6 +80,7 @@ export default function App() {
             <Route path="/timer" element={<Timer />} />
             <Route path="/calendar" element={<Calendar />} />
             <Route path="/statistics" element={<Statistics />} />
+            <Route path="/swot" element={<SWOT />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>

@@ -1,12 +1,12 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, ListTodo, Timer, CalendarDays, BarChart3 } from 'lucide-react';
+import { LayoutDashboard, ListTodo, Timer, CalendarDays, BarChart3, Target } from 'lucide-react';
 import styles from './MobileNav.module.css';
 
 const items = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Home' },
   { to: '/tasks', icon: ListTodo, label: 'Tasks' },
   { to: '/timer', icon: Timer, label: 'Timer' },
-  { to: '/calendar', icon: CalendarDays, label: 'Calendar' },
+  { to: '/swot', icon: Target, label: 'SWOT' },
   { to: '/statistics', icon: BarChart3, label: 'Stats' },
 ];
 
