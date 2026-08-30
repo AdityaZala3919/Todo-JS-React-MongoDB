@@ -19,11 +19,11 @@ export const AuthService = {
     if (!response.ok) { const errData = await response.json().catch(() => ({})); throw new Error(errData.error || 'Registration failed'); }
     const user = await response.json();
     if (user._id && !user.id) user.id = user._id;
-    await MemoryDb.loadUserData(user.id);
-    MemoryDb.users.push(user);
+    if (!MemoryDb.users.some((u) => u.id === user.id)) MemoryDb.users.push(user);
     Session.setCurrentUser(user.id);
     EventBus.emit(Events.AUTH_REGISTER, user);
     EventBus.emit(Events.AUTH_LOGIN, user);
+    MemoryDb.loadUserData(user.id).catch((err) => console.warn('[AuthService] Registration bootstrap warning:', err.message));
     return user;
   },
   async login(email, password) {
@@ -37,10 +37,19 @@ export const AuthService = {
     if (!response.ok) { const errData = await response.json().catch(() => ({})); throw new Error(errData.error || 'Invalid email or password'); }
     const safeUser = await response.json();
     if (safeUser._id && !safeUser.id) safeUser.id = safeUser._id;
-    await MemoryDb.loadUserData(safeUser.id);
     if (!MemoryDb.users.some((u) => u.id === safeUser.id)) MemoryDb.users.push(safeUser);
     Session.setCurrentUser(safeUser.id);
     EventBus.emit(Events.AUTH_LOGIN, safeUser);
+    
+    // Background cloud bootstrap sync to keep login sub-second (<0.3s)
+    MemoryDb.loadUserData(safeUser.id)
+      .then(() => {
+        EventBus.emit(Events.AUTH_LOGIN, safeUser);
+      })
+      .catch((err) => {
+        console.warn('[AuthService] Background bootstrap sync:', err.message);
+      });
+
     return safeUser;
   },
   logout() { Session.clearSession(); MemoryDb.clear(); EventBus.emit(Events.AUTH_LOGOUT); },
