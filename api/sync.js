@@ -39,6 +39,7 @@ export default async (req, res) => {
         'task_occurrences',
         'time_sessions',
         'user_settings',
+        'notes',
     ];
 
     if (!allowedCollections.includes(collection)) {

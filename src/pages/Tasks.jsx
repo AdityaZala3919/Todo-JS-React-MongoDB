@@ -59,7 +59,7 @@ export default function Tasks({ onNewTask }) {
           const isCompleted = t.task_type === 'recurring' ? t.todayOccurrence?.status === 'completed' : t.status === 'completed';
           const isArchived = t.status === 'archived';
           return (
-            <div key={t.id} className={`${styles.item} glass ${isCompleted ? styles.completed : ''}`}>
+            <div key={t.id} className={`${styles.item} ${isCompleted ? styles.completed : ''}`}>
               {tab !== 'archived' && (
                 <button className={`${styles.checkbox} ${isCompleted ? styles.checked : ''}`} onClick={() => handleToggle(t)}>
                   {isCompleted && <CheckCircle2 size={14} />}
@@ -78,7 +78,7 @@ export default function Tasks({ onNewTask }) {
               <div className={styles.itemActions}>
                 {!isArchived && (
                   <>
-                    <button className={styles.actionBtn} onClick={() => timer.start(t.id, t.todayOccurrence?.id)} title="Timer"><Play size={13} /></button>
+                    <button className={styles.actionBtn} onClick={() => useTimerStore.getState().start(t.id, t.todayOccurrence?.id)} title="Timer"><Play size={13} /></button>
                     <button className={styles.actionBtn} onClick={() => setEditTask(t)} title="Edit"><Edit3 size={13} /></button>
                     <button className={styles.actionBtn} onClick={() => handleArchive(t)} title="Archive"><Archive size={13} /></button>
                   </>

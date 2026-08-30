@@ -13,6 +13,7 @@ class MemoryDatabase {
     this.task_occurrences = [];
     this.time_sessions = [];
     this.user_settings = [];
+    this.notes = [];
   }
 
   async init() {
@@ -62,6 +63,7 @@ class MemoryDatabase {
     this.task_occurrences = normalize(data.task_occurrences);
     this.time_sessions = normalize(data.time_sessions);
     this.user_settings = normalize(data.user_settings);
+    this.notes = normalize(data.notes);
   }
 
   clear() {
@@ -74,6 +76,7 @@ class MemoryDatabase {
     this.task_occurrences = [];
     this.time_sessions = [];
     this.user_settings = [];
+    this.notes = [];
     console.log('[MemoryDb] Local caches cleared');
   }
 

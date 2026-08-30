@@ -17,7 +17,9 @@ import Calendar from './pages/Calendar';
 import Statistics from './pages/Statistics';
 import SWOT from './pages/SWOT';
 import Settings from './pages/Settings';
+import Notes from './pages/Notes';
 import Auth from './pages/Auth';
+import styles from './App.module.css';
 
 export default function App() {
   const { init, isLoggedIn, loading } = useAuthStore();
@@ -56,15 +58,15 @@ export default function App() {
   }
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column' }}>
+    <div className={styles.appLayout}>
       <Sidebar />
-      <div style={{ marginLeft: 'var(--sidebar-width)', flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+      <div className={styles.mainWrapper}>
         <TopBar
           onNewTask={() => setShowTaskForm(true)}
           onBulkAdd={() => setShowBulkAdd(true)}
           onBatchAdd={() => setShowBatchAdd(true)}
         />
-        <main style={{ flex: 1, overflowY: 'auto' }}>
+        <main className={styles.mainContent}>
           <Routes>
             <Route
               path="/dashboard"
@@ -81,6 +83,7 @@ export default function App() {
             <Route path="/calendar" element={<Calendar />} />
             <Route path="/statistics" element={<Statistics />} />
             <Route path="/swot" element={<SWOT />} />
+            <Route path="/notes" element={<Notes />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
@@ -91,13 +94,6 @@ export default function App() {
       {showBulkAdd && <BulkAddModal onClose={() => setShowBulkAdd(false)} />}
       {showBatchAdd && <BatchFormModal onClose={() => setShowBatchAdd(false)} />}
       <ToastContainer />
-
-      <style>{`
-        @media (max-width: 768px) {
-          div { margin-left: 0 !important; }
-          main { padding-bottom: calc(var(--bottom-nav-height) + 16px); }
-        }
-      `}</style>
     </div>
   );
 }

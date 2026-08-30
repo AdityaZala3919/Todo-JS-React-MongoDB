@@ -10,9 +10,25 @@
 .filters { display: flex; gap: 8px; }
 .filterSelect { padding: 5px 10px; border-radius: var(--radius-full); font-size: var(--text-xs); background: var(--surface-1); border: 1px solid var(--glass-border); color: var(--text-secondary); }
 .list { display: flex; flex-direction: column; gap: 6px; }
-.item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; }
+.item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--surface-1);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 54px;
+  transform: translateZ(0);
+}
+.item:hover {
+  background: var(--surface-2);
+  border-color: var(--glass-border-hover);
+}
 .completed { opacity: 0.5; }
-.checkbox { width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid var(--glass-border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: var(--transition); color: transparent; }
+.checkbox { width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid var(--glass-border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: border-color 0.15s ease, background-color 0.15s ease; color: transparent; }
 .checkbox:hover { border-color: var(--accent); }
 .checked { background: var(--accent-dim); border-color: var(--accent-dim); color: #fff; }
 .itemMain { flex: 1; min-width: 0; }
@@ -27,9 +43,9 @@
 .priorityBadge.pr_urgent { background: rgba(220, 38, 38, 0.15); color: #dc2626; }
 .typeBadge { font-size: 11px; }
 .metaText { font-size: var(--text-xs); color: var(--text-muted); }
-.itemActions { display: flex; gap: 3px; opacity: 0; transition: opacity 0.15s; }
+.itemActions { display: flex; gap: 3px; opacity: 0; transition: opacity 0.15s ease; }
 .item:hover .itemActions { opacity: 1; }
-.actionBtn { padding: 4px; border-radius: var(--radius-sm); color: var(--text-muted); transition: var(--transition); }
+.actionBtn { padding: 4px; border-radius: var(--radius-sm); color: var(--text-muted); transition: background-color 0.15s ease, color 0.15s ease; }
 .actionBtn:hover { color: var(--text-primary); background: var(--surface-2); }
 .empty { display: flex; flex-direction: column; align-items: center; padding: 48px; color: var(--text-muted); gap: 8px; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }

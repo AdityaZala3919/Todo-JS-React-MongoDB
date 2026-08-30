@@ -32,7 +32,8 @@ export default async (req, res) => {
             tags,
             tasks,
             time_sessions,
-            existingSettingsDoc
+            existingSettingsDoc,
+            notes
         ] = await Promise.all([
             db.collection('users').findOne({ _id: userId }),
             db.collection('projects').find({ user_id: userId }).toArray(),
@@ -40,6 +41,7 @@ export default async (req, res) => {
             db.collection('tasks').find({ user_id: userId }).toArray(),
             db.collection('time_sessions').find({ user_id: userId }).toArray(),
             db.collection('user_settings').findOne({ _id: userId }),
+            db.collection('notes').find({ user_id: userId }).toArray(),
         ]);
 
         let user = userDoc;
@@ -90,6 +92,7 @@ export default async (req, res) => {
             recurrence_rules,
             task_tags,
             task_occurrences,
+            notes: notes || [],
         });
     } catch (err) {
         console.error('[API Bootstrap] Error:', err);

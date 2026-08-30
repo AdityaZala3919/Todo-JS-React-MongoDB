@@ -9,11 +9,54 @@ import { formatTimer, formatDate, formatDuration, MONTH_NAMES } from '../utils/d
 import { toast } from '../components/UI/Toast';
 import styles from './Dashboard.module.css';
 
+function DashboardTimerWidget() {
+  const timer = useTimerStore();
+  useEffect(() => {
+    timer.subscribe();
+    return () => timer.unsubscribe();
+  }, []);
+
+  return (
+    <div className={`glass ${styles.timerWidget} ${timer.activeSession ? styles.timerActive : ''}`}>
+      {timer.activeSession ? (
+        <>
+          <div className={styles.timerLabel}>Active Timer</div>
+          <div className={styles.timerTask}>{timer.activeSession.task_title || 'Task'}</div>
+          <div className={styles.timerDisplay}>{formatTimer(timer.elapsed)}</div>
+          <div className={styles.timerControls}>
+            {timer.isPaused ? (
+              <button className="btn btn-primary btn-sm" onClick={timer.resume}>
+                <Play size={14} /> Resume
+              </button>
+            ) : (
+              <button className="btn btn-secondary btn-sm" onClick={timer.pause}>
+                <Pause size={14} /> Pause
+              </button>
+            )}
+            <button
+              className="btn btn-danger btn-sm"
+              onClick={() => {
+                timer.stop();
+                toast.success('Timer stopped');
+              }}
+            >
+              <Square size={14} /> Stop
+            </button>
+          </div>
+        </>
+      ) : (
+        <>
+          <div className={styles.timerLabelIdle}>Time Tracking</div>
+          <div className={styles.timerDisplayIdle}>00:00:00</div>
+          <p className={styles.timerHint}>Click ▶ on a task to start tracking</p>
+        </>
+      )}
+    </div>
+  );
+}
+
 export default function Dashboard({ onNewTask, onBulkAdd, onBatchAdd }) {
   const { refreshKey, toggleCompletion, archiveTask, restoreTask } = useTaskStore();
-  const timer = useTimerStore();
-
-  useEffect(() => { timer.subscribe(); return () => timer.unsubscribe(); }, []);
 
   const todaysVerse = useMemo(() => VerseService.getTodaysVerse(), []);
 
@@ -30,7 +73,13 @@ export default function Dashboard({ onNewTask, onBulkAdd, onBatchAdd }) {
 
   const handleToggle = (taskId, type, occId) => { toggleCompletion(taskId, type === 'recurring' ? occId : undefined); };
   const handleArchive = (taskId) => { archiveTask(taskId); toast.success('Task archived', { label: 'Undo', fn: () => restoreTask(taskId) }); };
-  const handleTimer = (taskId, occId) => { try { timer.start(taskId, occId); } catch (err) { toast.error(err.message); } };
+  const handleTimer = (taskId, occId) => {
+    try {
+      useTimerStore.getState().start(taskId, occId);
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
 
   const now = new Date();
   const year = now.getFullYear(), month = now.getMonth(), todayDate = now.getDate();
@@ -121,7 +170,7 @@ export default function Dashboard({ onNewTask, onBulkAdd, onBatchAdd }) {
               const progress = RecurrenceService.getTodayProgress(t.id);
               const streak = RecurrenceService.getStreak(t.id);
               return (
-                <div key={t.id} className={`${styles.taskCard} glass ${isCompleted ? styles.completed : ''}`}>
+                <div key={t.id} className={`${styles.taskCard} ${isCompleted ? styles.completed : ''}`}>
                   <button className={`${styles.checkbox} ${isCompleted ? styles.checked : ''}`} onClick={() => handleToggle(t.id, 'recurring', t.occurrence?.id)}>
                     {isCompleted && <CheckCircle2 size={14} />}
                   </button>
@@ -149,7 +198,7 @@ export default function Dashboard({ onNewTask, onBulkAdd, onBatchAdd }) {
             {data.oneTime.map((t) => {
               const isCompleted = t.status === 'completed';
               return (
-                <div key={t.id} className={`${styles.taskCard} glass ${isCompleted ? styles.completed : ''}`}>
+                <div key={t.id} className={`${styles.taskCard} ${isCompleted ? styles.completed : ''}`}>
                   <button className={`${styles.checkbox} ${isCompleted ? styles.checked : ''}`} onClick={() => handleToggle(t.id, 'one_time')}>
                     {isCompleted && <CheckCircle2 size={14} />}
                   </button>
@@ -178,25 +227,7 @@ export default function Dashboard({ onNewTask, onBulkAdd, onBatchAdd }) {
 
       <aside className={styles.side}>
         {/* Timer Widget */}
-        <div className={`glass ${styles.timerWidget} ${timer.activeSession ? styles.timerActive : ''}`}>
-          {timer.activeSession ? (
-            <>
-              <div className={styles.timerLabel}>Active Timer</div>
-              <div className={styles.timerTask}>{timer.activeSession.task_title || 'Task'}</div>
-              <div className={styles.timerDisplay}>{formatTimer(timer.elapsed)}</div>
-              <div className={styles.timerControls}>
-                {timer.isPaused ? <button className="btn btn-primary btn-sm" onClick={timer.resume}><Play size={14} /> Resume</button> : <button className="btn btn-secondary btn-sm" onClick={timer.pause}><Pause size={14} /> Pause</button>}
-                <button className="btn btn-danger btn-sm" onClick={() => { timer.stop(); toast.success('Timer stopped'); }}><Square size={14} /> Stop</button>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className={styles.timerLabelIdle}>Time Tracking</div>
-              <div className={styles.timerDisplayIdle}>00:00:00</div>
-              <p className={styles.timerHint}>Click ▶ on a task to start tracking</p>
-            </>
-          )}
-        </div>
+        <DashboardTimerWidget />
 
         {/* Mini Calendar */}
         <div className={`glass ${styles.calendar}`}>
