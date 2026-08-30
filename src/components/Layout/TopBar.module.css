@@ -63,7 +63,138 @@
   gap: 8px;
 }
 
+.topBarTimer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(129, 140, 248, 0.25);
+  border-radius: var(--radius-full);
+  padding: 4px 8px 4px 10px;
+  box-shadow: 0 0 16px rgba(99, 102, 241, 0.12);
+  animation: fadeIn 0.2s var(--ease);
+  flex-shrink: 0;
+}
+
+.timerIndicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent-bright);
+}
+
+.pulseDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 8px #34d399;
+}
+
+.timerIndicator[data-running="false"] .pulseDot {
+  background: var(--status-warning);
+  box-shadow: 0 0 8px var(--status-warning);
+  animation: none;
+}
+
+.timerIndicator[data-running="true"] .pulseDot {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.spinningClock {
+  color: var(--accent-bright);
+}
+
+.timerInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.timerTaskTitle {
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--text-primary);
+  max-width: 140px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.timerTime {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--accent-bright);
+  letter-spacing: 0.04em;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.timerControls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.timerBtn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+  cursor: pointer;
+}
+
+.timerBtn:active {
+  transform: scale(0.92);
+}
+
+.timerPauseBtn {
+  background: var(--surface-3);
+  color: var(--text-primary);
+}
+
+.timerPauseBtn:hover {
+  background: var(--accent-subtle);
+  color: var(--accent-bright);
+}
+
+.timerResumeBtn {
+  background: var(--accent-dim);
+  color: #fff;
+}
+
+.timerResumeBtn:hover {
+  background: var(--accent);
+}
+
+.timerStopBtn {
+  background: rgba(248, 113, 113, 0.15);
+  color: #f87171;
+}
+
+.timerStopBtn:hover {
+  background: rgba(248, 113, 113, 0.28);
+}
+
 .btnText {
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+@media (max-width: 900px) {
+  .timerTaskTitle {
+    max-width: 80px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -75,5 +206,8 @@
   }
   .searchBox {
     max-width: unset;
+  }
+  .timerTaskTitle {
+    display: none;
   }
 }
