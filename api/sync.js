@@ -40,6 +40,7 @@ export default async (req, res) => {
         'time_sessions',
         'user_settings',
         'notes',
+        'visit_later',
     ];
 
     if (!allowedCollections.includes(collection)) {

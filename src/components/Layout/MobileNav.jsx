@@ -1,10 +1,11 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, ListTodo, Timer, BarChart3, StickyNote } from 'lucide-react';
+import { LayoutDashboard, ListTodo, BookmarkCheck, Timer, BarChart3, StickyNote } from 'lucide-react';
 import styles from './MobileNav.module.css';
 
 const items = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Home' },
   { to: '/tasks', icon: ListTodo, label: 'Tasks' },
+  { to: '/visit-later', icon: BookmarkCheck, label: 'Saved' },
   { to: '/timer', icon: Timer, label: 'Timer' },
   { to: '/notes', icon: StickyNote, label: 'Notes' },
   { to: '/statistics', icon: BarChart3, label: 'Stats' },

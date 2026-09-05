@@ -1,11 +1,12 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { LayoutDashboard, ListTodo, Timer, CalendarDays, BarChart3, Target, StickyNote, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, ListTodo, BookmarkCheck, Timer, CalendarDays, BarChart3, Target, StickyNote, Settings, LogOut } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import styles from './Sidebar.module.css';
 
 const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/tasks', icon: ListTodo, label: 'Tasks' },
+  { to: '/visit-later', icon: BookmarkCheck, label: 'Visit Later' },
   { to: '/timer', icon: Timer, label: 'Timer' },
   { to: '/calendar', icon: CalendarDays, label: 'Calendar' },
   { to: '/statistics', icon: BarChart3, label: 'Statistics' },

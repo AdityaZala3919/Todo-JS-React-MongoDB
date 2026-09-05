@@ -14,6 +14,7 @@ class MemoryDatabase {
     this.time_sessions = [];
     this.user_settings = [];
     this.notes = [];
+    this.visit_later = [];
   }
 
   _saveToLocalStorage(userId, data) {
@@ -45,6 +46,7 @@ class MemoryDatabase {
       this.time_sessions = normalize(data.time_sessions);
       this.user_settings = normalize(data.user_settings);
       this.notes = normalize(data.notes);
+      this.visit_later = normalize(data.visit_later);
       EventBus.emit(Events.DATA_IMPORTED, data);
       return true;
     } catch {
@@ -108,6 +110,7 @@ class MemoryDatabase {
       this.time_sessions = normalize(data.time_sessions);
       this.user_settings = normalize(data.user_settings);
       this.notes = normalize(data.notes);
+      this.visit_later = normalize(data.visit_later);
       this._saveToLocalStorage(userId, data);
       EventBus.emit(Events.DATA_IMPORTED, data);
     } catch (err) {
@@ -130,6 +133,7 @@ class MemoryDatabase {
     this.time_sessions = [];
     this.user_settings = [];
     this.notes = [];
+    this.visit_later = [];
     console.log('[MemoryDb] Local caches cleared');
   }
 

@@ -18,6 +18,7 @@ import Statistics from './pages/Statistics';
 import SWOT from './pages/SWOT';
 import Settings from './pages/Settings';
 import Notes from './pages/Notes';
+import VisitLater from './pages/VisitLater';
 import Auth from './pages/Auth';
 import styles from './App.module.css';
 
@@ -79,6 +80,7 @@ export default function App() {
               }
             />
             <Route path="/tasks" element={<Tasks onNewTask={() => setShowTaskForm(true)} />} />
+            <Route path="/visit-later" element={<VisitLater />} />
             <Route path="/timer" element={<Timer />} />
             <Route path="/calendar" element={<Calendar />} />
             <Route path="/statistics" element={<Statistics />} />
