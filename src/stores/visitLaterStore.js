@@ -5,6 +5,8 @@ import { VisitLaterRepository } from '../repositories/visit-later-repository';
 import { now } from '../utils/date';
 import { normalizeUrl, detectCategory, generateSuggestedTitle } from '../utils/urlHelper';
 
+import { EventBus, Events } from '../services/events';
+
 function getStorageKey(userId) {
   const effectiveUserId = userId || Session.getCurrentUserId() || 'guest';
   return `taskflow_visit_later_data_${effectiveUserId}`;
@@ -27,37 +29,44 @@ function loadLocalVisitLater(userId) {
   return [];
 }
 
-export const useVisitLaterStore = create((set, get) => ({
-  userId: Session.getCurrentUserId() || 'guest',
-  items: [],
-
-  initUser: (userId) => {
-    const effectiveUserId = userId || Session.getCurrentUserId() || 'guest';
-    const memoryItems = (MemoryDb.visit_later || []).filter(
-      (item) => item.user_id === effectiveUserId || !item.user_id
-    );
-    const localItems = loadLocalVisitLater(effectiveUserId);
-
-    let items = memoryItems.length > 0 ? memoryItems : localItems;
-
-    items = items.map((item) => ({
-      ...item,
-      user_id: item.user_id || effectiveUserId,
-      created_at: item.created_at || item.createdAt || now(),
-      updated_at: item.updated_at || item.updatedAt || now(),
-    }));
-
-    if (memoryItems.length === 0 && localItems.length > 0 && effectiveUserId !== 'guest') {
-      localItems.forEach((li) => {
-        if (!MemoryDb.visit_later.some((m) => m.id === li.id)) {
-          VisitLaterRepository.create({ ...li, user_id: effectiveUserId });
-        }
-      });
+export const useVisitLaterStore = create((set, get) => {
+  // Synchronize whenever cloud data is imported or session changes
+  EventBus.on(Events.DATA_IMPORTED, () => {
+    const state = get();
+    if (state.userId) {
+      state.initUser(state.userId);
     }
+  });
 
-    set({ userId: effectiveUserId, items });
-    get().saveState();
-  },
+  return {
+    userId: Session.getCurrentUserId() || 'guest',
+    items: [],
+
+    initUser: (userId) => {
+      const effectiveUserId = userId || Session.getCurrentUserId() || 'guest';
+      const memoryItems = (MemoryDb.visit_later || []).filter(
+        (item) => item.user_id === effectiveUserId || !item.user_id
+      );
+
+      // If MemoryDb has loaded, cloud database is source of truth
+      // Only fall back to local cache before initial sync or when offline
+      const localItems = loadLocalVisitLater(effectiveUserId);
+      const items = MemoryDb._initialized
+        ? memoryItems
+        : memoryItems.length > 0
+        ? memoryItems
+        : localItems;
+
+      const normalized = items.map((item) => ({
+        ...item,
+        user_id: item.user_id || effectiveUserId,
+        created_at: item.created_at || item.createdAt || now(),
+        updated_at: item.updated_at || item.updatedAt || now(),
+      }));
+
+      set({ userId: effectiveUserId, items: normalized });
+      get().saveState();
+    },
 
   saveState: () => {
     try {
@@ -118,9 +127,10 @@ export const useVisitLaterStore = create((set, get) => ({
     get().updateItem(id, { is_visited: !item.is_visited });
   },
 
-  toggleFavorite: (id) => {
-    const item = get().items.find((i) => i.id === id);
-    if (!item) return;
-    get().updateItem(id, { is_favorite: !item.is_favorite });
-  },
-}));
+    toggleFavorite: (id) => {
+      const item = get().items.find((i) => i.id === id);
+      if (!item) return;
+      get().updateItem(id, { is_favorite: !item.is_favorite });
+    },
+  };
+});
