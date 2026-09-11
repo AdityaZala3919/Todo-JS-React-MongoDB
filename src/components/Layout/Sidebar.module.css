@@ -15,4 +15,54 @@
 .logoutBtn { color: var(--text-muted); padding: 4px; border-radius: var(--radius-sm); transition: var(--transition); }
 .logoutBtn:hover { color: var(--status-error); background: rgba(248,113,113,0.1); }
 
-@media (max-width: 768px) { .sidebar { display: none; } }
+@media (max-width: 1150px) and (min-width: 769px) {
+  .sidebar {
+    width: 68px;
+    padding: 16px 8px;
+    align-items: center;
+  }
+  .logo {
+    justify-content: center;
+    padding: 0;
+    margin-bottom: 20px;
+  }
+  .logoText {
+    display: none;
+  }
+  .nav {
+    align-items: center;
+    width: 100%;
+  }
+  .navLabel {
+    display: none;
+  }
+  .navItem {
+    justify-content: center;
+    padding: 10px 0;
+    width: 44px;
+    height: 44px;
+  }
+  .navText {
+    display: none;
+  }
+  .bottom {
+    align-items: center;
+    width: 100%;
+  }
+  .userInfo {
+    display: none;
+  }
+  .userSection {
+    justify-content: center;
+    padding: 6px 0;
+  }
+  .logoutBtn {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
+}

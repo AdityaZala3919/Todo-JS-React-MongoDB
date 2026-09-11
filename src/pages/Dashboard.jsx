@@ -93,19 +93,49 @@ export default function Dashboard({ onNewTask, onBulkAdd, onBatchAdd }) {
         {/* Stat Cards — compact */}
         <div className={styles.statsRow}>
           <div className={`${styles.statCard} glass`}>
-            <div className={styles.statTop}><span className={styles.statLabel}>Productive Time</span><Clock size={14} className={styles.statIcon} /></div>
+            <div className={styles.statTop}>
+              <span className={styles.statLabel}>
+                <span className={styles.labelDesktop}>Productive Time</span>
+                <span className={styles.labelMobile}>Time</span>
+              </span>
+              <Clock size={14} className={styles.statIcon} />
+            </div>
             <div className={styles.statValue}>{data.stats?.totalTimeFormatted || '0m'}</div>
             <div className={styles.statSub}>+Today</div>
           </div>
           <div className={`${styles.statCard} glass`}>
-            <div className={styles.statTop}><span className={styles.statLabel}>Tasks Today</span><CheckCircle2 size={14} className={styles.statIcon} /></div>
+            <div className={styles.statTop}>
+              <span className={styles.statLabel}>
+                <span className={styles.labelDesktop}>Tasks Today</span>
+                <span className={styles.labelMobile}>Tasks</span>
+              </span>
+              <CheckCircle2 size={14} className={styles.statIcon} />
+            </div>
             <div className={styles.statValue}>{data.completedCount} / {data.totalCount}</div>
             <div className={styles.statSub}>{data.totalCount > 0 ? Math.round((data.completedCount / data.totalCount) * 100) : 0}% done</div>
           </div>
           <div className={`${styles.statCard} glass`}>
-            <div className={styles.statTop}><span className={styles.statLabel}>Best Streak</span><Flame size={14} className={styles.statIconFire} /></div>
+            <div className={styles.statTop}>
+              <span className={styles.statLabel}>
+                <span className={styles.labelDesktop}>Best Streak</span>
+                <span className={styles.labelMobile}>Streak</span>
+              </span>
+              <Flame size={14} className={styles.statIconFire} />
+            </div>
             <div className={styles.statValue}>{data.bestStreak > 0 ? `${data.bestStreak} Days` : '—'}</div>
-            <div className={styles.statSub}>{data.bestStreak > 0 ? `🔥 ${data.bestTask}` : 'Start a streak!'}</div>
+            <div className={styles.statSub}>
+              {data.bestStreak > 0 ? (
+                <>
+                  <span className={styles.subDesktop}>🔥 {data.bestTask}</span>
+                  <span className={styles.subMobile}>🔥 {data.bestStreak}d</span>
+                </>
+              ) : (
+                <>
+                  <span className={styles.subDesktop}>Start a streak!</span>
+                  <span className={styles.subMobile}>0 days</span>
+                </>
+              )}
+            </div>
           </div>
         </div>
 
@@ -121,7 +151,8 @@ export default function Dashboard({ onNewTask, onBulkAdd, onBatchAdd }) {
                 <span className={styles.verseTag}>Daily Wisdom</span>
                 <span className={styles.verseDivider}>•</span>
                 <span className={styles.verseBadge}>
-                  Chapter {todaysVerse.chapter}, Verse {todaysVerse.verse}
+                  <span className={styles.verseBadgeDesktop}>Chapter {todaysVerse.chapter}, Verse {todaysVerse.verse}</span>
+                  <span className={styles.verseBadgeMobile}>Ch. {todaysVerse.chapter}, v.{todaysVerse.verse}</span>
                 </span>
               </div>
               <span className={styles.verseSource}>Chanakya Niti</span>
@@ -137,16 +168,20 @@ export default function Dashboard({ onNewTask, onBulkAdd, onBatchAdd }) {
         {/* Today's Tasks */}
         <div className={styles.section}>
           <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>Today's Schedule <span className={styles.badge}>{data.totalCount}</span></h2>
+            <h2 className={styles.sectionTitle}>
+              <span className={styles.titleDesktop}>Today's Schedule</span>
+              <span className={styles.titleMobile}>Schedule</span>
+              <span className={styles.badge}>{data.totalCount}</span>
+            </h2>
             <div className={styles.headerButtons}>
-              <button className="btn btn-secondary btn-sm" onClick={onBulkAdd} title="Quick paste multiple tasks">
-                <ListPlus size={14} /> Bulk Add
+              <button className={`btn btn-secondary btn-sm ${styles.secHeaderBtn}`} onClick={onBulkAdd} title="Quick paste multiple tasks">
+                <ListPlus size={14} /> <span className={styles.headerBtnText}>Bulk Add</span>
               </button>
-              <button className="btn btn-secondary btn-sm" onClick={onBatchAdd} title="Add multiple structured tasks">
-                <Layers size={14} /> Batch Form
+              <button className={`btn btn-secondary btn-sm ${styles.secHeaderBtn}`} onClick={onBatchAdd} title="Add multiple structured tasks">
+                <Layers size={14} /> <span className={styles.headerBtnText}>Batch Form</span>
               </button>
-              <button className="btn btn-primary btn-sm" onClick={onNewTask} title="Create single task">
-                <Plus size={14} /> New Task
+              <button className={`btn btn-primary btn-sm ${styles.newBtn}`} onClick={onNewTask} title="Create single task">
+                <Plus size={14} /> <span>New Task</span>
               </button>
             </div>
           </div>

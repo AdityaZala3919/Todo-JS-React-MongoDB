@@ -4,6 +4,7 @@ import { useTaskStore } from '../../stores/taskStore';
 import { TagRepository } from '../../repositories/tag-repository';
 import { ProjectRepository } from '../../repositories/project-repository';
 import { Session } from '../../services/session';
+import { useModalKeyboard } from '../../hooks/useModalKeyboard';
 import { toast } from '../UI/Toast';
 import styles from './BulkAddModal.module.css';
 
@@ -36,7 +37,7 @@ export default function BulkAddModal({ onClose }) {
   };
 
   const handleCreate = (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (parsedTasks.length === 0) {
       toast.error('Please enter at least one task');
       return;
@@ -67,6 +68,11 @@ export default function BulkAddModal({ onClose }) {
       toast.error(err.message || 'Failed to create tasks');
     }
   };
+
+  useModalKeyboard({
+    onSubmit: handleCreate,
+    onClose,
+  });
 
   return (
     <div className={styles.overlay} onClick={onClose}>

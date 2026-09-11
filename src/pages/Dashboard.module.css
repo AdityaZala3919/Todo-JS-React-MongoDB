@@ -11,6 +11,12 @@
 .statIconFire { color: #f97316; }
 .statValue { font-size: var(--text-xl); font-weight: 700; font-family: var(--font-mono); margin-bottom: 2px; }
 .statSub { font-size: var(--text-xs); color: var(--teal); font-weight: 500; }
+.labelDesktop { display: inline; }
+.labelMobile { display: none; }
+.subDesktop { display: inline; }
+.subMobile { display: none; }
+.verseBadgeDesktop { display: inline; }
+.verseBadgeMobile { display: none; }
 
 /* Verse / Wisdom Card */
 .verseCard {
@@ -114,8 +120,12 @@
 .section { }
 .sectionHeader { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
 .sectionTitle { font-size: var(--text-md); font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.titleDesktop { display: inline; }
+.titleMobile { display: none; }
 .badge { font-size: var(--text-xs); background: var(--accent-subtle); color: var(--accent-bright); padding: 2px 8px; border-radius: var(--radius-full); font-weight: 600; }
 .headerButtons { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.secHeaderBtn { flex-shrink: 0; }
+.newBtn { flex-shrink: 0; }
 
 /* Overdue */
 .overdueBox { padding: 12px 16px; background: rgba(248,113,113,0.05); border: 1px solid rgba(248,113,113,0.15); border-radius: var(--radius-lg); margin-bottom: 10px; }
@@ -199,5 +209,162 @@
 .calPast { color: var(--teal); }
 
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-@media (max-width: 900px) { .grid { grid-template-columns: 1fr; } .side { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; } }
-@media (max-width: 768px) { .statsRow { grid-template-columns: 1fr; } .side { grid-template-columns: 1fr; } .grid { padding: 16px; padding-bottom: 80px; } }
+@media (max-width: 1200px) {
+  .grid { grid-template-columns: 1fr; padding: 20px 20px; }
+  .side { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 8px; }
+}
+@media (max-width: 768px) {
+  .grid {
+    padding: 14px 12px;
+    gap: 14px;
+    padding-bottom: 80px;
+  }
+  .statsRow {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .statCard {
+    padding: 8px 8px;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .statTop {
+    margin-bottom: 3px;
+    gap: 2px;
+  }
+  .labelDesktop {
+    display: none;
+  }
+  .labelMobile {
+    display: inline;
+  }
+  .subDesktop {
+    display: none;
+  }
+  .subMobile {
+    display: inline;
+  }
+  .statLabel {
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 600;
+  }
+  .statValue {
+    font-size: 1.15rem;
+    margin-bottom: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .statSub {
+    font-size: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .verseBadgeDesktop {
+    display: none;
+  }
+  .verseBadgeMobile {
+    display: inline;
+  }
+  .verseHeader {
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+  .verseTitleGroup {
+    min-width: 0;
+    gap: 6px;
+    overflow: hidden;
+  }
+  .verseTag {
+    font-size: 11px;
+    white-space: nowrap;
+  }
+  .verseBadge {
+    font-size: 11px;
+    padding: 2px 6px;
+    white-space: nowrap;
+  }
+  .verseSource {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .side {
+    grid-template-columns: 1fr;
+  }
+  .taskActions {
+    opacity: 1;
+  }
+  .progressWrap {
+    width: 65px;
+  }
+  .headerBtnText {
+    display: none;
+  }
+  .titleDesktop {
+    display: none;
+  }
+  .titleMobile {
+    display: inline;
+  }
+  .sectionHeader {
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+  .sectionTitle {
+    font-size: var(--text-sm);
+    gap: 6px;
+    min-width: 0;
+    flex-shrink: 1;
+    white-space: nowrap;
+  }
+  .headerButtons {
+    gap: 5px;
+    flex-shrink: 0;
+    flex-wrap: nowrap;
+  }
+  .secHeaderBtn {
+    width: 30px;
+    height: 30px;
+    padding: 0 !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+  }
+  .newBtn {
+    padding: 5px 10px !important;
+    font-size: 12px;
+  }
+}
+@media (max-width: 420px) {
+  .statsRow {
+    gap: 6px;
+  }
+  .statCard {
+    padding: 7px 6px;
+  }
+  .statValue {
+    font-size: 1.05rem;
+  }
+  .statLabel {
+    font-size: 10px;
+  }
+  .statSub {
+    font-size: 9.5px;
+  }
+  .progressWrap {
+    width: 48px;
+  }
+  .secHeaderBtn {
+    width: 26px;
+    height: 26px;
+  }
+  .newBtn {
+    padding: 4px 8px !important;
+    font-size: 11px;
+  }
+}

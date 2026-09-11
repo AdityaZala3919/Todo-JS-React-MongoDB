@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { X, Layers, Plus } from 'lucide-react';
 import { useSWOTStore } from '../../stores/swotStore';
+import { useModalKeyboard } from '../../hooks/useModalKeyboard';
 import { toast } from '../UI/Toast';
 
 export default function NewBoardModal({ onClose }) {
@@ -9,7 +10,7 @@ export default function NewBoardModal({ onClose }) {
   const [description, setDescription] = useState('');
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (!name.trim()) {
       toast.error('Please enter a board name');
       return;
@@ -23,6 +24,11 @@ export default function NewBoardModal({ onClose }) {
     toast.success(`Created board "${name.trim()}"`);
     onClose();
   };
+
+  useModalKeyboard({
+    onSubmit: handleSubmit,
+    onClose,
+  });
 
   return (
     <div

@@ -33,6 +33,7 @@ import {
 } from '../utils/urlHelper';
 import { formatDate } from '../utils/date';
 import { toast } from '../components/UI/Toast';
+import { useModalKeyboard } from '../hooks/useModalKeyboard';
 import styles from './VisitLater.module.css';
 
 export const CATEGORIES = [
@@ -107,6 +108,11 @@ function LinkModal({ item, onClose, onSave }) {
     });
     onClose();
   };
+
+  useModalKeyboard({
+    onSubmit: handleSubmit,
+    onClose,
+  });
 
   return (
     <div className={styles.overlay} onClick={(e) => e.target === e.currentTarget && onClose()}>
@@ -299,11 +305,11 @@ function LinkCard({ item, onToggleVisited, onToggleFavorite, onEdit, onDelete })
 
       {/* Footer / Actions */}
       <div className={styles.cardFooter}>
-        <div className={styles.cardDate}>
-          {formatDate(item.created_at || item.createdAt, { short: true }) || 'Recent'}
-        </div>
+        <div className={styles.cardFooterTop}>
+          <div className={styles.cardDate}>
+            {formatDate(item.created_at || item.createdAt, { short: true }) || 'Recent'}
+          </div>
 
-        <div className={styles.cardActions}>
           <button
             className={`${styles.visitToggleBtn} ${item.is_visited ? styles.visitToggleBtnVisited : ''}`}
             onClick={() => onToggleVisited(item.id)}
@@ -312,31 +318,35 @@ function LinkCard({ item, onToggleVisited, onToggleFavorite, onEdit, onDelete })
             {item.is_visited ? <CheckCircle2 size={13} /> : <Check size={13} />}
             <span>{item.is_visited ? 'Visited' : 'Mark Visited'}</span>
           </button>
+        </div>
 
-          <button
-            className={styles.actionBtn}
-            onClick={handleCopy}
-            title={copied ? 'Copied' : 'Copy link'}
-          >
-            {copied ? <Check size={14} color="var(--status-success)" /> : <Copy size={14} />}
-          </button>
+        <div className={styles.cardActions}>
+          <div className={styles.cardIconActions}>
+            <button
+              className={styles.actionBtn}
+              onClick={handleCopy}
+              title={copied ? 'Copied' : 'Copy link'}
+            >
+              {copied ? <Check size={14} color="var(--status-success)" /> : <Copy size={14} />}
+            </button>
 
-          <button
-            className={styles.actionBtn}
-            onClick={() => onEdit(item)}
-            title="Edit"
-          >
-            <Edit3 size={14} />
-          </button>
+            <button
+              className={styles.actionBtn}
+              onClick={() => onEdit(item)}
+              title="Edit"
+            >
+              <Edit3 size={14} />
+            </button>
 
-          <button
-            className={styles.actionBtn}
-            onClick={() => onDelete(item.id)}
-            title="Delete"
-            style={{ color: 'var(--status-error)' }}
-          >
-            <Trash2 size={14} />
-          </button>
+            <button
+              className={styles.actionBtn}
+              onClick={() => onDelete(item.id)}
+              title="Delete"
+              style={{ color: 'var(--status-error)' }}
+            >
+              <Trash2 size={14} />
+            </button>
+          </div>
 
           <a
             href={item.url}
@@ -450,30 +460,32 @@ function LinkListItem({ item, onToggleVisited, onToggleFavorite, onEdit, onDelet
           <span>{item.is_visited ? 'Visited' : 'Mark Visited'}</span>
         </button>
 
-        <button
-          className={styles.actionBtn}
-          onClick={handleCopy}
-          title={copied ? 'Copied' : 'Copy link'}
-        >
-          {copied ? <Check size={14} color="var(--status-success)" /> : <Copy size={14} />}
-        </button>
+        <div className={styles.listIconActions}>
+          <button
+            className={styles.actionBtn}
+            onClick={handleCopy}
+            title={copied ? 'Copied' : 'Copy link'}
+          >
+            {copied ? <Check size={14} color="var(--status-success)" /> : <Copy size={14} />}
+          </button>
 
-        <button
-          className={styles.actionBtn}
-          onClick={() => onEdit(item)}
-          title="Edit"
-        >
-          <Edit3 size={14} />
-        </button>
+          <button
+            className={styles.actionBtn}
+            onClick={() => onEdit(item)}
+            title="Edit"
+          >
+            <Edit3 size={14} />
+          </button>
 
-        <button
-          className={styles.actionBtn}
-          onClick={() => onDelete(item.id)}
-          title="Delete"
-          style={{ color: 'var(--status-error)' }}
-        >
-          <Trash2 size={14} />
-        </button>
+          <button
+            className={styles.actionBtn}
+            onClick={() => onDelete(item.id)}
+            title="Delete"
+            style={{ color: 'var(--status-error)' }}
+          >
+            <Trash2 size={14} />
+          </button>
+        </div>
 
         <a
           href={item.url}
@@ -705,28 +717,30 @@ export default function VisitLater() {
             />
           </div>
 
-          <select
-            className={styles.categorySelect}
-            value={quickCategory}
-            onChange={(e) => setQuickCategory(e.target.value)}
-          >
-            <option value="youtube">📺 YouTube</option>
-            <option value="course">🎓 Course</option>
-            <option value="paper">📄 Research Paper</option>
-            <option value="blog">✍️ Blog</option>
-            <option value="other">🌐 Other</option>
-          </select>
-
-          <div className={styles.quickDumpActions}>
-            <button
-              type="submit"
-              className="btn btn-primary btn-sm"
-              disabled={!quickUrl.trim()}
-              style={{ opacity: quickUrl.trim() ? 1 : 0.6 }}
+          <div className={styles.quickDumpControls}>
+            <select
+              className={styles.categorySelect}
+              value={quickCategory}
+              onChange={(e) => setQuickCategory(e.target.value)}
             >
-              <Plus size={14} />
-              <span>Dump Link</span>
-            </button>
+              <option value="youtube">📺 YouTube</option>
+              <option value="course">🎓 Course</option>
+              <option value="paper">📄 Research Paper</option>
+              <option value="blog">✍️ Blog</option>
+              <option value="other">🌐 Other</option>
+            </select>
+
+            <div className={styles.quickDumpActions}>
+              <button
+                type="submit"
+                className="btn btn-primary btn-sm"
+                disabled={!quickUrl.trim()}
+                style={{ opacity: quickUrl.trim() ? 1 : 0.6 }}
+              >
+                <Plus size={14} />
+                <span>Dump Link</span>
+              </button>
+            </div>
           </div>
         </form>
 

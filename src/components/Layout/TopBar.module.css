@@ -61,6 +61,11 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
+}
+
+.actionBtn {
+  flex-shrink: 0;
 }
 
 .topBarTimer {
@@ -191,7 +196,19 @@
   50% { opacity: 0.4; transform: scale(0.85); }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1150px) {
+  .btnText {
+    display: none;
+  }
+  .actionBtn {
+    width: 34px;
+    height: 34px;
+    padding: 0 !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+  }
   .timerTaskTitle {
     max-width: 80px;
   }
@@ -199,15 +216,68 @@
 
 @media (max-width: 768px) {
   .topBar {
-    padding: 0 16px;
+    padding: 0 12px;
+    gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
   }
   .btnText {
     display: none;
   }
+  .kbd {
+    display: none;
+  }
   .searchBox {
     max-width: unset;
+    min-width: 0;
+    padding: 6px 10px;
+    flex: 1;
+  }
+  .searchInput {
+    min-width: 0;
+    width: 100%;
+    font-size: 13px;
+  }
+  .actions {
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .actionBtn {
+    width: 32px;
+    height: 32px;
+    padding: 0 !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
   }
   .timerTaskTitle {
     display: none;
+  }
+}
+
+@media (max-width: 400px) {
+  .topBar {
+    padding: 0 8px;
+    gap: 6px;
+  }
+  .searchBox {
+    padding: 5px 8px;
+  }
+  .actions {
+    gap: 4px;
+  }
+  .actionBtn {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-sm);
+  }
+}
+
+@media (max-width: 340px) {
+  .actionBtn {
+    width: 26px;
+    height: 26px;
   }
 }

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { X, Zap, AlertTriangle, TrendingUp, ShieldAlert } from "lucide-react";
 import { useSWOTStore } from "../../stores/swotStore";
+import { useModalKeyboard } from "../../hooks/useModalKeyboard";
 import { toast } from "../UI/Toast";
 import styles from "./SWOTItemModal.module.css";
 
@@ -35,7 +36,7 @@ export default function SWOTItemModal({ item, initialQuadrant = "strengths", onC
   }, [item, initialQuadrant]);
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (!title.trim()) {
       toast.error("Please enter a title");
       return;
@@ -63,6 +64,11 @@ export default function SWOTItemModal({ item, initialQuadrant = "strengths", onC
     }
     onClose();
   };
+
+  useModalKeyboard({
+    onSubmit: handleSubmit,
+    onClose,
+  });
 
   return (
     <div className={styles.overlay} onClick={onClose}>

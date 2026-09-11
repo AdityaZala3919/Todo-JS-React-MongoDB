@@ -8,6 +8,7 @@ import {
 import { useAuthStore } from '../stores/authStore';
 import { useNotesStore } from '../stores/notesStore';
 import { formatDate } from '../utils/date';
+import { useModalKeyboard } from '../hooks/useModalKeyboard';
 import styles from './Notes.module.css';
 
 /* ── color swatches ── */
@@ -87,6 +88,11 @@ function NoteEditor({ note, onClose, onUpdate, onDelete, onTogglePin }) {
   const handleOverlayClick = (e) => {
     if (e.target === overlayRef.current) { flush(); onClose(); }
   };
+
+  useModalKeyboard({
+    onClose: () => { flush(); onClose(); },
+    onSubmit: () => { flush(); onClose(); },
+  });
 
   /* ── formatting helpers ── */
   const applyInline = (before, after = before) => {

@@ -16,7 +16,7 @@ export default function MobileNav() {
     <nav className={styles.mobileNav}>
       {items.map(({ to, icon: Icon, label }) => (
         <NavLink key={to} to={to} className={({ isActive }) => `${styles.item} ${isActive ? styles.active : ''}`}>
-          <Icon size={20} strokeWidth={1.8} />
+          <Icon size={18} strokeWidth={1.8} />
           <span>{label}</span>
         </NavLink>
       ))}

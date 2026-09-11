@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Plus, ListPlus, Layers, Play, Pause, Square, Clock } from 'lucide-react';
 import { useTimerStore } from '../../stores/timerStore';
@@ -8,12 +8,26 @@ import styles from './TopBar.module.css';
 
 export default function TopBar({ onNewTask, onBulkAdd, onBatchAdd }) {
   const [searchQuery, setSearchQuery] = useState('');
+  const searchInputRef = useRef(null);
   const navigate = useNavigate();
   const timer = useTimerStore();
 
   useEffect(() => {
     timer.subscribe();
     return () => timer.unsubscribe();
+  }, []);
+
+  // Global '/' shortcut to focus search bar
+  useEffect(() => {
+    const handleGlobalKeyDown = (e) => {
+      if (e.key === '/' && !['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName) && !document.activeElement?.isContentEditable) {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+        searchInputRef.current?.select();
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
   }, []);
 
   // Update HTML head document title with active timer
@@ -35,14 +49,17 @@ export default function TopBar({ onNewTask, onBulkAdd, onBatchAdd }) {
     if (e.key === 'Enter' && searchQuery.trim()) {
       navigate(`/tasks?q=${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery('');
+    } else if (e.key === 'Escape') {
+      searchInputRef.current?.blur();
     }
   };
 
   return (
     <header className={styles.topBar}>
-      <div className={styles.searchBox}>
+      <div className={styles.searchBox} onClick={() => searchInputRef.current?.focus()}>
         <Search size={16} className={styles.searchIcon} />
         <input
+          ref={searchInputRef}
           type="text"
           placeholder="Search tasks, projects..."
           className={styles.searchInput}
@@ -103,7 +120,7 @@ export default function TopBar({ onNewTask, onBulkAdd, onBatchAdd }) {
 
       <div className={styles.actions}>
         <button
-          className="btn btn-secondary btn-sm"
+          className={`btn btn-secondary btn-sm ${styles.actionBtn}`}
           onClick={onBulkAdd}
           title="Quick Paste multiple tasks"
         >
@@ -111,7 +128,7 @@ export default function TopBar({ onNewTask, onBulkAdd, onBatchAdd }) {
           <span className={styles.btnText}>Bulk Add</span>
         </button>
         <button
-          className="btn btn-secondary btn-sm"
+          className={`btn btn-secondary btn-sm ${styles.actionBtn}`}
           onClick={onBatchAdd}
           title="Add multiple structured tasks"
         >
@@ -119,7 +136,7 @@ export default function TopBar({ onNewTask, onBulkAdd, onBatchAdd }) {
           <span className={styles.btnText}>Batch Form</span>
         </button>
         <button
-          className="btn btn-primary btn-sm"
+          className={`btn btn-primary btn-sm ${styles.actionBtn}`}
           onClick={onNewTask}
           title="Create a new task"
         >

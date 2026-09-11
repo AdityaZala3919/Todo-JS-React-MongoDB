@@ -4,6 +4,7 @@ import { useTaskStore } from '../../stores/taskStore';
 import { TagRepository } from '../../repositories/tag-repository';
 import { ProjectRepository } from '../../repositories/project-repository';
 import { Session } from '../../services/session';
+import { useModalKeyboard } from '../../hooks/useModalKeyboard';
 import { toast } from '../UI/Toast';
 import styles from './TaskForm.module.css';
 
@@ -26,9 +27,13 @@ export default function TaskForm({ task, onClose }) {
   const tags = userId ? TagRepository.getByUser(userId) : [];
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
+    if (!formData.title.trim()) {
+      toast.error('Please enter a task title');
+      return;
+    }
     try {
-      const data = { ...formData };
+      const data = { ...formData, title: formData.title.trim() };
       if (data.estimated_duration) data.estimated_duration = Number(data.estimated_duration);
       if (data.min_duration) data.min_duration = Number(data.min_duration);
       if (isEdit) { updateTask(task.id, data); toast.success('Task updated'); }
@@ -37,6 +42,11 @@ export default function TaskForm({ task, onClose }) {
       onClose();
     } catch (err) { toast.error(err.message); }
   };
+
+  useModalKeyboard({
+    onSubmit: handleSubmit,
+    onClose,
+  });
 
   const set = (field, value) => setFormData((prev) => ({ ...prev, [field]: value }));
   const toggleDay = (day) => set('days_of_week', formData.days_of_week.includes(day) ? formData.days_of_week.filter((d) => d !== day) : [...formData.days_of_week, day]);

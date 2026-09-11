@@ -28,17 +28,17 @@ export default function Sidebar() {
       <nav className={styles.nav}>
         <div className={styles.navLabel}>Menu</div>
         {navItems.map(({ to, icon: Icon, label }) => (
-          <NavLink key={to} to={to} className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`}>
+          <NavLink key={to} to={to} title={label} className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`}>
             <Icon size={18} strokeWidth={1.8} />
-            <span>{label}</span>
+            <span className={styles.navText}>{label}</span>
           </NavLink>
         ))}
       </nav>
 
       <div className={styles.bottom}>
-        <NavLink to="/settings" className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`}>
+        <NavLink to="/settings" title="Settings" className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`}>
           <Settings size={18} strokeWidth={1.8} />
-          <span>Settings</span>
+          <span className={styles.navText}>Settings</span>
         </NavLink>
         <div className={styles.userSection}>
           <div className={styles.avatar}>{(user?.display_name || user?.email || 'U').slice(0, 2).toUpperCase()}</div>

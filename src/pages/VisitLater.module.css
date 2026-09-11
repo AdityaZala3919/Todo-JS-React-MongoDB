@@ -170,6 +170,12 @@
   border-color: var(--accent);
 }
 
+.quickDumpControls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .quickDumpActions {
   display: flex;
   align-items: center;
@@ -192,7 +198,13 @@
   gap: 8px;
   overflow-x: auto;
   padding-bottom: 4px;
-  scrollbar-width: thin;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.categoryNav::-webkit-scrollbar {
+  display: none;
 }
 
 .catTab {
@@ -561,12 +573,24 @@
   gap: 8px;
 }
 
+.cardFooterTop {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .cardDate {
   font-size: 0.7rem;
   color: var(--text-muted);
 }
 
 .cardActions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cardIconActions {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -794,6 +818,12 @@
   flex-shrink: 0;
 }
 
+.listIconActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 /* ══════════════════════════════════════
    Modal Styles
    ══════════════════════════════════════ */
@@ -922,24 +952,153 @@
 
 @media (max-width: 768px) {
   .page {
-    padding: 16px;
+    padding: 16px 14px;
     gap: 16px;
+    padding-bottom: 80px;
   }
 
-  .linksGrid {
-    grid-template-columns: 1fr;
+  .header {
+    gap: 12px;
+  }
+
+  .headerActions {
+    width: 100%;
+    display: flex;
+    gap: 8px;
+  }
+
+  .searchBox {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .searchBox input {
+    width: 100%;
+    min-width: 0;
   }
 
   .quickDumpRow {
     flex-direction: column;
     align-items: stretch;
+    gap: 8px;
   }
 
   .quickInputWrapper {
     width: 100%;
+    min-width: 0;
+  }
+
+  .quickDumpControls {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .categorySelect {
+    flex: 1;
+    min-width: 0;
   }
 
   .quickDumpActions {
+    flex-shrink: 0;
+  }
+
+  .linksGrid {
+    columns: 1 auto;
+  }
+}
+
+@media (max-width: 600px) {
+  .cardFooter {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .cardFooterTop {
+    display: flex;
+    align-items: center;
     justify-content: space-between;
+    width: 100%;
+  }
+
+  .cardActions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding-top: 8px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.07);
+  }
+
+  .cardIconActions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .subControls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .statusFilterGroup {
+    width: 100%;
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-bottom: 2px;
+  }
+
+  .statusFilterGroup::-webkit-scrollbar {
+    display: none;
+  }
+
+  .statusBtn {
+    padding: 5px 10px;
+    white-space: nowrap;
+  }
+
+  /* List Item Mobile */
+  .listItem {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .listLeft {
+    width: 100%;
+  }
+
+  .listActions {
+    width: 100%;
+    justify-content: space-between;
+    border-top: 1px dashed rgba(255, 255, 255, 0.07);
+    padding-top: 8px;
+  }
+
+  .modal {
+    max-height: 90dvh;
+  }
+}
+
+@media (max-width: 400px) {
+  .page {
+    padding: 12px 10px;
+    gap: 12px;
+  }
+  .catTab {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+  .statusBtn {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+  .linkCard {
+    padding: 12px;
   }
 }

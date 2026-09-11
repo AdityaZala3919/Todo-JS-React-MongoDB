@@ -3,6 +3,7 @@ import { X, Layers, Plus, Trash2, Copy, Sparkles } from 'lucide-react';
 import { useTaskStore } from '../../stores/taskStore';
 import { ProjectRepository } from '../../repositories/project-repository';
 import { Session } from '../../services/session';
+import { useModalKeyboard } from '../../hooks/useModalKeyboard';
 import { toast } from '../UI/Toast';
 import styles from './BatchFormModal.module.css';
 
@@ -55,7 +56,7 @@ export default function BatchFormModal({ onClose }) {
   const validCount = rows.filter((r) => r.title.trim().length > 0).length;
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     const validRows = rows.filter((r) => r.title.trim().length > 0);
     if (validRows.length === 0) {
       toast.error('Please enter a title for at least one task');
@@ -80,6 +81,11 @@ export default function BatchFormModal({ onClose }) {
       toast.error(err.message || 'Failed to create tasks');
     }
   };
+
+  useModalKeyboard({
+    onSubmit: handleSubmit,
+    onClose,
+  });
 
   return (
     <div className={styles.overlay} onClick={onClose}>
@@ -124,6 +130,14 @@ export default function BatchFormModal({ onClose }) {
                       placeholder="What needs to be done?"
                       value={row.title}
                       onChange={(e) => updateRow(row.id, 'title', e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
+                          e.preventDefault();
+                          if (index === rows.length - 1) {
+                            handleAddRow();
+                          }
+                        }
+                      }}
                       autoFocus={index === 0}
                     />
                   </div>
